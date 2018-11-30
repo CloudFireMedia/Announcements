@@ -1,13 +1,13 @@
-function format_master_TRIGGERED(){format_master()}
+function format_master_TRIGGERED(){format_master_()}
 
-function format_master(doc) {
+function format_master_(doc) {
 
-  var doc = DocumentApp.getActiveDocument();
+  var doc = doc || DocumentApp.getActiveDocument() || Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID');
   var body = doc.getBody();
   var paragraphs = body.getParagraphs();
   
   format_doubleSpaceToSingle(doc);
-  format_removeEmptyParagraphs(doc);
+  format_removeEmptyParagraphs_();
   format_master_fixPageBreaksAndHeadings_(doc);
   format_master_formatEventsFuture(doc);
   format_master_formatEventsPast(doc);
@@ -15,19 +15,6 @@ function format_master(doc) {
   // Private Functions
   // -----------------
     
-  function format_removeEmptyParagraphs(doc) {
-  
-    for(var p in paragraphs) {
-      if( ! paragraphs[p].getText())
-        if( ! paragraphs[p].findElement(DocumentApp.ElementType.HORIZONTAL_RULE))
-          if( ! paragraphs[p].findElement(DocumentApp.ElementType.PAGE_BREAK))
-            if( ! paragraphs[p].findElement(DocumentApp.ElementType.INLINE_IMAGE))
-              if( ! paragraphs[p].findElement(DocumentApp.ElementType.INLINE_DRAWING))
-                if( ! paragraphs[p].isAtDocumentEnd())
-                  paragraphs[p].removeFromParent();
-    }
-  }
-  
   function format_doubleSpaceToSingle(doc) {
     body.replaceText("[ ]{2,}", " "); 
   }
@@ -94,7 +81,7 @@ function format_master(doc) {
     //  }
   }
   
-} // format_master()
+} // format_master_()
 
 function format_master_fixPageBreaksAndHeadings_(doc){
 
@@ -145,5 +132,18 @@ function format_master_fixPageBreaksAndHeadings_(doc){
         }
       }
     }
+  }
+}
+
+function format_removeEmptyParagraphs_() {
+  
+  for(var p in paragraphs) {
+    if( ! paragraphs[p].getText())
+      if( ! paragraphs[p].findElement(DocumentApp.ElementType.HORIZONTAL_RULE))
+        if( ! paragraphs[p].findElement(DocumentApp.ElementType.PAGE_BREAK))
+          if( ! paragraphs[p].findElement(DocumentApp.ElementType.INLINE_IMAGE))
+            if( ! paragraphs[p].findElement(DocumentApp.ElementType.INLINE_DRAWING))
+              if( ! paragraphs[p].isAtDocumentEnd())
+                paragraphs[p].removeFromParent();
   }
 }

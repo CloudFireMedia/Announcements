@@ -27,7 +27,7 @@ Words about something\
   
 }
 
-function showInstructions_Document(){
+function showInstructions_Document_(){
   var title ='Document Overview'; 
   var html = "<h1>"+title+"</h1> \
 \
@@ -72,7 +72,7 @@ Adjusting color for future and past pages<br>\
   showInstructions(html, title);
 }
 
-function showInstructions_RecurringContent(){
+function showInstructions_RecurringContent_(){
   var title = 'Recurring Content'
   var html = "<h1>"+title+"</h1> \
 \

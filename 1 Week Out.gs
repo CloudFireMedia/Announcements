@@ -1,12 +1,12 @@
-function runAllFormattingFunctions_oneWeekOut(doc) {
-  doc = doc || DocumentApp.openById(config.files.announcements.oneWeek)
-  formatFont_oneWeek(doc);
+function runAllFormattingFunctions_oneWeekOut_(doc) {
+  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_NEXT_SUNDAY_ID'))
+  formatFont_oneWeek_(doc);
 //  format_removeEmptyParagraphs_oneWeek(doc);
-  format_removeEmptyParagraphs(doc);
+  format_removeEmptyParagraphs_();
 }
 
 function formatFont_oneWeek(doc) {
-  doc = doc || DocumentApp.openById(config.files.announcements.oneWeek);//var doc = DocumentApp.openById(id)
+  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_NEXT_SUNDAY_ID'))
   var body = doc.getBody();
   body.editAsText().setFontFamily('Lato');
   body.editAsText().setFontSize(9);
@@ -20,7 +20,7 @@ function formatFont_oneWeek(doc) {
 }
 
 //function format_removeEmptyParagraphs_oneWeek(doc) { ///rewrite based on the upcoming sunday version
-//  doc = doc || DocumentApp.openById(config.files.announcements.oneWeek);
+//  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_NEXT_SUNDAY_ID'))
 //  var body = doc.getBody();
 //  var paras = body.getParagraphs(); 
 //  for (var i = 0; i < paras.length; i++) { 
