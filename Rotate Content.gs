@@ -274,7 +274,10 @@ function moveOldestToArchive(){
   //                           IF the filename of ['This Sunday' doc](https://docs.google.com/document/d/1U61THQS-Ktno-Ku1Jk6GX0UaSmsRgq4YGiJzePJleyo/edit) contains the date for this coming Sunday or today().
   //                           ELSE the notification should not appear
 
-function moveSlides() {// delete all content in the destination folder and copy service slides corresponding to the events written in 'This Sunday's Announcements' doc to the destination folder
+//delete all content in the destination folder and copy service slides corresponding to the 
+//events written in 'This Sunday's Announcements' doc to the destination folder
+
+function moveSlides_() {
   log('Start: moveSlides()')
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   var text = doc.getBody().editAsText().getText();
@@ -322,7 +325,7 @@ function moveSlides() {// delete all content in the destination folder and copy 
   
   log('End: moveSlides()')
   
-} // moveSlides()
+} // moveSlides_()
 
 function copyContent(fromDoc, toDoc){
   var fromBody = fromDoc.getBody();

@@ -64,7 +64,7 @@
 //  }
 //}
 
-function formatFont_archive() {///change to use config formats
+function formatFont_archive_() {
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_ARCHIVE_ID'));
   var body = doc.getBody();
   body.editAsText().setFontFamily('Lato');

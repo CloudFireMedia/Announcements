@@ -41,22 +41,19 @@ function format_master()                     {format_master_()}
 function showInstructions_Document()         {showInstructions_Document_()}
 function showInstructions_RecurringContent() {showInstructions_RecurringContent_()}
 
-// 
-function rotateContent() {rotateContent_()}
-
 // This (upcoming) Sunday (0 weeks)
 function runAllFormattingFunctions_upcomingWeek() {runAllFormattingFunctions_upcomingWeek_()}
+function moveSlides()                             {moveSlides_()}
+function emailStaff()                             {emailStaff_()}
+function emailStaff_submit(executiveAssitant)     {emailStaff_submit_(executiveAssitant)}
 
 // Next Sunday (1 weeks)
 function runAllFormattingFunctions_oneWeekOut() {runAllFormattingFunctions_oneWeekOut_()}
-function formatFont_oneWeek() {formatFont_oneWeek_()}
+function formatFont_oneWeek()                   {formatFont_oneWeek_()}
 
 // Draft Sunday (2 weeks)
-
 function sendMailFunction() {sendMailFunction_()}
-//function () {()}
-//function () {()}
-//function () {()}
-//function () {()}
-//function () {()}
-//function () {()}
+function rotateContent()    {rotateContent_()}
+
+// Archive
+function formatFont_archive() {formatFont_archive_()}

@@ -79,26 +79,26 @@
 //  .addToUi();
 //}
 
-function makeMenu_announcements_oneWeekHence(){
-  DocumentApp.getUi().createMenu('[ Custom Menu ]')
-  .addItem('Format All', 'PL.runAllFormattingFunctions_oneWeekOut')
-  .addSeparator()
-  .addItem('Format Font', 'PL.formatFont_oneWeek')
-  .addItem('Format Paragraphs', 'PL.format_removeEmptyParagraphs')
-  .addToUi();
-}
+//function makeMenu_announcements_oneWeekHence(){
+//  DocumentApp.getUi().createMenu('[ Custom Menu ]')
+//  .addItem('Format All', 'PL.runAllFormattingFunctions_oneWeekOut')
+//  .addSeparator()
+//  .addItem('Format Font', 'PL.formatFont_oneWeek')
+//  .addItem('Format Paragraphs', 'PL.format_removeEmptyParagraphs')
+//  .addToUi();
+//}
 
-function makeMenu_announcements_upcomingWeek(){
-  DocumentApp.getUi().createMenu('[ Custom Menu ]')
-  .addItem('Format', 'PL.runAllFormattingFunctions_upcomingWeek')
-  .addItem('Move Service Slides', 'PL.moveSlides')
-  .addItem('Email Staff', 'PL.emailStaff')
-  .addToUi();
-}
+//function makeMenu_announcements_upcomingWeek(){
+//  DocumentApp.getUi().createMenu('[ Custom Menu ]')
+//  .addItem('Format', 'PL.runAllFormattingFunctions_upcomingWeek')
+//  .addItem('Move Service Slides', 'PL.moveSlides')
+//  .addItem('Email Staff', 'PL.emailStaff')
+//  .addToUi();
+//}
 
-function makeMenu_announcements_archive(){
-  DocumentApp.getUi().createMenu('[ Custom Menu ]')
-  .addItem('Format', 'PL.format_archive')
-  .addToUi();
-}
+//function makeMenu_announcements_archive(){
+//  DocumentApp.getUi().createMenu('[ Custom Menu ]')
+//  .addItem('Format', 'PL.format_archive')
+//  .addToUi();
+//}
 
