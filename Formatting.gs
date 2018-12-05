@@ -2,12 +2,21 @@ function format_master_TRIGGERED(){format_master_()}
 
 function format_master_(doc) {
 
-  var doc = doc || DocumentApp.getActiveDocument() || Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID');
+  if (doc === undefined) {
+  
+    doc = DocumentApp.getActiveDocument();
+  
+    if (doc === null) {
+      var masterDocId = Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID');
+      doc = DocumentApp.openById(masterDocId);
+    }
+  }
+
   var body = doc.getBody();
   var paragraphs = body.getParagraphs();
   
   format_doubleSpaceToSingle(doc);
-  format_removeEmptyParagraphs_();
+  format_removeEmptyParagraphs_(paragraphs);
   format_master_fixPageBreaksAndHeadings_(doc);
   format_master_formatEventsFuture(doc);
   format_master_formatEventsPast(doc);
@@ -102,7 +111,7 @@ function format_master_fixPageBreaksAndHeadings_(doc){
   }
   
   //find page titles
-  var pageTitleSearchPattern = '\\[ \\d{2}\\.\\d{2} ] Sunday Announcements|\\[ RECURRING CONTENT ]|\\[.*?END.*?]';//'[ 03.11 ] Sunday Announcements' or '[ END OD DOC ]' or '[ RECURRING CONTENT ]' -- Note you must double-escape reserved characters since this is a text pattern not a regex
+  var pageTitleSearchPattern = '\\[ \\d{2}\\.\\d{2} ] Sunday Announcements|\\[ RECURRING CONTENT ]|\\[.*?END.*?]';//'[ 03.11 ] Sunday Announcements' or '[ END OF DOC ]' or '[ RECURRING CONTENT ]' -- Note you must double-escape reserved characters since this is a text pattern not a regex
   var re_ordinalSunday = /^ *(?:First|Second|Third|Fourth|Fifth) Sunday of the month *$/i;
   var pageTitle = null;
   
@@ -135,7 +144,15 @@ function format_master_fixPageBreaksAndHeadings_(doc){
   }
 }
 
-function format_removeEmptyParagraphs_() {
+function format_removeEmptyParagraphs_(paragraphs) {
+
+  if (paragraphs === undefined) {
+    var doc = doc || DocumentApp.getActiveDocument();
+    if (doc === null) {
+      throw new Error('No active document');
+    }
+    var paragraphs = doc.getBody().getParagraphs();
+  }
   
   for(var p in paragraphs) {
     if( ! paragraphs[p].getText())

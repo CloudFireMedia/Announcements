@@ -44,13 +44,16 @@ function showInstructions_RecurringContent() {showInstructions_RecurringContent_
 // 
 function rotateContent() {rotateContent_()}
 
-// This Sunday (0 weeks)
+// This (upcoming) Sunday (0 weeks)
 function runAllFormattingFunctions_upcomingWeek() {runAllFormattingFunctions_upcomingWeek_()}
 
 // Next Sunday (1 weeks)
 function runAllFormattingFunctions_oneWeekOut() {runAllFormattingFunctions_oneWeekOut_()}
 function formatFont_oneWeek() {formatFont_oneWeek_()}
-//function () {()}
+
+// Draft Sunday (2 weeks)
+
+function sendMailFunction() {sendMailFunction_()}
 //function () {()}
 //function () {()}
 //function () {()}

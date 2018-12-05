@@ -1,8 +1,11 @@
 function rotateContent_() {
 
   //check to see if it's Sunday morning before Noon, if so, warn user
+  
   var now = new Date();
-  if(now.getDay()==0 && now.getHours() < 12){
+  
+  if (now.getDay()==0 && now.getHours() < 12) {
+  
     var title = 'Rotate Content';
     var prompt = Utilities.formatString(
       "\
@@ -14,40 +17,47 @@ Do you want to continue?\
 ",
       DriveApp.getFolderById(Config.get('SLIDES_FOLDER_DESTINATION_ID')).getUrl()
     );
-    if(DocumentApp.getUi().alert(title, prompt, Browser.Buttons.YES_NO) != 'YES') return;
+    
+    if(DocumentApp.getUi().alert(title, prompt, Browser.Buttons.YES_NO) != 'YES') {
+      return;
+    }
   }
-  /*
-  This   -> Master (check in)
-  Next   -> This
-  Draft  -> Next
-  Master -> Draft (check out)
-  Master -> Archive (oldest)
-  */
-  moveThisToMaster();
-  moveNextToThis();
-  moveDraftToNext();
-  moveMasterToDraft();
-  moveOldestToArchive();
-}
+  
+  moveThisToMaster();    // This   -> Master (check in)
+  moveNextToThis();      // Next   -> This
+  moveDraftToNext();     // Draft  -> Next
+  moveMasterToDraft();   // Master -> Draft (check out)
+  moveOldestToArchive(); // Master -> Archive (oldest)
+  
+} // rotateContent_()
 
 function moveThisToMaster(){
-  var thisSundayDoc     = DocumentApp.openById(Config.get('ANNOUNCEMENTS_THIS_SUNDAY_ID'));
+
+  var thisWeekId    = Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID');
+  var thisSundayDoc = DocumentApp.openById(thisWeekId);
+  
   ///thisSundayHeading is dependent upon content - it may be better to grab the last placeholder paragraph
   var thisSundayHeading = getHeading(thisSundayDoc).trim();//gets the first non-empty paragraph text
   var thisSundayBody    = thisSundayDoc.getBody();
   
-  var masterDoc  = DocumentApp.openById(Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID'));
-  var masterBody = masterDoc.getBody();
-  var startElem  = masterBody.findText(thisSundayHeading.replace('[','\\['));
-  if ( ! startElem) throw "Unable to find '" + thisSundayHeading + "' in Master doc"; //if the header wasn't found in the master doc, throw an error
+  var masterDocId = Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID');
+  var masterDoc   = DocumentApp.openById(masterDocId);
+  var masterBody  = masterDoc.getBody();
+  var startElem   = masterBody.findText(thisSundayHeading.replace('[','\\['));
+  
+  if ( ! startElem) {
+    throw "Unable to find '" + thisSundayHeading + "' in Master doc"; 
+  }
+  
   var endElem = masterBody.findText(
     //condifer using: escapeGasRegExString(config.announcements.placeholder)
     config.announcements.placeholder
-    .replace('{','\\{')
-    .replace('[','\\[')
-    .replace('|','\\|')
+      .replace('{','\\{')
+      .replace('[','\\[')
+      .replace('|','\\|')
     , startElem
   );//might need some others
+  
   var nextPageBreak   = masterBody.findElement(DocumentApp.ElementType.PAGE_BREAK, startElem);
   
   var startIndex      = startElem     && masterBody.getChildIndex(startElem.getElement().getParent());
@@ -57,17 +67,19 @@ function moveThisToMaster(){
 
 //  throw endIndex +' : '+ pageBreakIndex +' : '+ endIndexForReal
   
-  for (var i=endIndexForReal; i>=startIndex; i--){
-//    masterBody.getChild(i).setAttributes({BACKGROUND_COLOR:'#ffff00'});
-//    masterBody.getChild(i).setAttributes({FOREGROUND_COLOR:'#ff0000'});
+  for (var i=endIndexForReal; i>=startIndex; i--) {
     masterBody.getChild(i).removeFromParent();
   }
-  if(endIndexForReal != endIndex)//oops, the pagebreak was contained in deleted content
+  
+  if(endIndexForReal != endIndex) {//oops, the pagebreak was contained in deleted content
     masterBody.insertPageBreak(startIndex);//so we add one back
+  }
 
   //check-in This Sunday content
   for (var j=thisSundayBody.getNumChildren()-1; j>=0; --j) {//in reverse as each para is inserted before the last
+  
     var thisSundayElem = thisSundayBody.getChild(j).copy();
+    
     if (thisSundayElem.getType() == DocumentApp.ElementType.PARAGRAPH) {
       masterBody.insertParagraph(startIndex, thisSundayElem);//insert para from This Sunday
     } else if (thisSundayElem.getType() == DocumentApp.ElementType.TABLE) {
@@ -88,8 +100,8 @@ function moveThisToMaster(){
 
 function moveNextToThis(){
 
-  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_NEXT_SUNDAY_ID'));
-  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_THIS_SUNDAY_ID'));
+  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   copyContent(fromDoc, toDoc);
     
   var sundayTitles = getWeekTitles();
@@ -104,8 +116,8 @@ function moveNextToThis(){
 function moveDraftToNext(){
   var sundayTitles = getWeekTitles();
   var title = getSundayOfMonthOrdinal(sundayTitles.dates.draftSunday) + ' Sunday of the month';
-  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_DRAFT_SUNDAY_ID'));
-  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_NEXT_SUNDAY_ID'));
+  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
+  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
 
   copyContent(fromDoc, toDoc);
 
@@ -127,7 +139,7 @@ function moveMasterToDraft(){
   var masterDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID'));
   var masterBody = masterDoc.getBody();
 
-  var draftDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_DRAFT_SUNDAY_ID'));
+  var draftDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
   var draftBody = draftDoc.getBody();
 
   var sundayTitles = getWeekTitles();
@@ -181,18 +193,17 @@ function moveMasterToDraft(){
 }
 
 function moveOldestToArchive(){
-  //firstly make sure we can access the archive doc
-//  if( ! Config.get('ANNOUNCEMENTS_ARCHIVE_SUNDAY_ID')) throw 'Archive Setup is not configured.  Archiving cannot run';
-  try{ var archiveDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_ARCHIVE_SUNDAY_ID')); }
-  catch(e){throw 'Error accessing archive document. ('+Config.get('ANNOUNCEMENTS_ARCHIVE_SUNDAY_ID')+')';};
-  var archiveBody = archiveDoc.getBody();
+
+  var archiveDocId = Config.get('ANNOUNCEMENTS_ARCHIVE_ID');
+  var archiveDoc   = DocumentApp.openById(archiveDocId);  
+  var archiveBody  = archiveDoc.getBody();
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID'));
   var body = doc.getBody();
   var paragraphs = body.getParagraphs();
   
   //first, let's cleanup the doc to avoid moving blank paragraphs
-  format_master();///FIX
+  format_master_();///FIX
   
   //get the index of the page to begin archive from - currently only the last page of annoucements
   //could be changed to accept user date input or start from cursor location page
@@ -202,12 +213,22 @@ function moveOldestToArchive(){
     var currentChild = paragraphs[p];
     break;
   }
-  if( ! start) throw 'Unable to find any annoucement page';//this should never happen unless the regex is wrong
+  
+  if( ! start) {
+    throw 'Unable to find any annoucement page';//this should never happen unless the regex is wrong
+  }
   
   //start archiving
   var archiveInsertIndex = 0;
+  
   while( ! currentChild.findText('(?i)\\[ *?END ?OF ?(?:DOC|DOCUMENT) *?]') ){//process all paragraphs up the [ END ]
-    try{currentChild.removeFromParent();} catch(e){/*errors if no END tag in doc, ignore*/};//could do this based on last child index but that keeps changing...yeah, leave it --Bob
+  
+    try {
+      currentChild.removeFromParent();
+    } catch(e) {
+      /*errors if no END tag in doc, ignore*/
+    };//could do this based on last child index but that keeps changing...yeah, leave it --Bob
+    
     switch(currentChild.getType()){//different types are moved differently
         
       case DocumentApp.ElementType.PARAGRAPH:
@@ -255,13 +276,13 @@ function moveOldestToArchive(){
 
 function moveSlides() {// delete all content in the destination folder and copy service slides corresponding to the events written in 'This Sunday's Announcements' doc to the destination folder
   log('Start: moveSlides()')
-  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_THIS_SUNDAY_ID'));
+  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   var text = doc.getBody().editAsText().getText();
   var announcementStartRegEx = /\[[^\|\]]+\|/g;
   var fileTitleArray = [];
   
   while (fileTitleMatch = announcementStartRegEx.exec(text))//removes the first and last characters, ie: the [ and | from the above (but oddly leaves the spaces)
-  fileTitleArray.push( fileTitleMatch[0].replace(/(^. *| *.$)/g, '') );//removes [, | and any spaces
+  fileTitleArray.push(fileTitleMatch[0].replace(/(^. *| *.$)/g, '') );//removes [, | and any spaces
   
   var folderSource = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_SOURCE_ID'));
   var folderDestination = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_DESTINATION_ID'));
@@ -273,8 +294,9 @@ function moveSlides() {// delete all content in the destination folder and copy 
   var filesDestination = folderDestination.getFiles();
   if( ! filesDestination) err('Unable to access slide destination folder')
   try{
-    while (filesDestination.hasNext())
+    while (filesDestination.hasNext()) {
       filesDestination.next().setTrashed(true);
+    }
   }catch(e){
     err('Unable to delete old files from slide destination folder')
   }
@@ -294,10 +316,13 @@ function moveSlides() {// delete all content in the destination folder and copy 
         }
       }
     }
-  }catch(e){err('Unable to copy slides to destination folder')}
+  } catch(e){
+    err('Unable to copy slides to destination folder')
+  }
   
   log('End: moveSlides()')
-}
+  
+} // moveSlides()
 
 function copyContent(fromDoc, toDoc){
   var fromBody = fromDoc.getBody();

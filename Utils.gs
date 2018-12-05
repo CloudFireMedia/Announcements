@@ -103,3 +103,76 @@ function getSundayOfMonthOrdinal(date) {
   var ordinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
   return ordinals[Math.floor(dayOfMonth / 7)];
 }
+
+function uniq(a) {
+  var seen = {};
+  return a.filter(function(item) {
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  });
+}
+
+function arrayUnique(array) {
+  var a = array.concat();
+  for (var i = 0; i < a.length; ++i) {
+    for (var j = i + 1; j < a.length; ++j) {
+      if (a[i] === a[j])
+        a.splice(j--, 1);
+    }
+  }
+  
+  return a;
+}
+
+function getWeekTitles() {
+
+  //get dates for next three Sundays
+  var thisSunday = getUpcomingSunday(null, true);
+  var nextSunday = dateAdd(thisSunday, 'week', 1);
+  var draftSunday = dateAdd(thisSunday, 'week', 2);
+  
+  //get title for each date
+  var thisSundayTitle = fDate(thisSunday, "[ MM.dd ] 'Sunday Announcements'");
+  var nextSundayTitle = fDate(nextSunday, "[ MM.dd ] 'Sunday Announcements'");
+  var draftSundayTitle = fDate(draftSunday, "[ MM.dd ] 'Sunday Announcements - Draft Document'");
+  
+  var out = {
+    thisSunday  : thisSundayTitle,
+    nextSunday  : nextSundayTitle,
+    draftSunday : draftSundayTitle,
+    dates:{
+      thisSunday  : thisSunday,
+      nextSunday  : nextSunday,
+      draftSunday : draftSunday,
+    }
+  }
+
+  return out;
+}
+
+function escapeGasRegExString(re, escapeCharsArrOpt, ignoreCharsArrOpt){
+  
+  var charsToReplace = '{[|';
+
+  charsToReplace = charsToReplace.split('');
+  if(escapeCharsArrOpt)//add user supplied values
+    charsToReplace = charsToReplace.concat(escapeCharsArrOpt);
+  if(ignoreCharsArrOpt)//remove user supplied values
+    charsToReplace = charsToReplace
+    .filter(function(e){return this.toString().indexOf(e)<0;}, ignoreCharsArrOpt);
+  
+  var str = re.toString()
+  .replace(/^\//,'')//remove opening /
+  .replace(/\/[imgus]*$/,'');//remove closing / and any flags
+
+  log(charsToReplace)
+  for(var c in charsToReplace){
+    Logger.log(charsToReplace[c])
+    Logger.log( new RegExp(charsToReplace[c].replace('\[','\\['),'g').toString() )
+//    str = str.replace(new RegExp(charsToReplace[c].replace('\[','\\['),'g'), '\\$&')
+    str = str.replace(charsToReplace[c], '\\$&')
+  }
+  
+  return str;
+}
+
+
