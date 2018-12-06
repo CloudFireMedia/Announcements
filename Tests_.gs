@@ -5,3 +5,7 @@ function test_sendMailFunction() {
 function test_rotateContent() {
   rotateContent_()
 }
+
+function test_getWeekTitles() {
+  getWeekTitles()
+}

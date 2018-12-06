@@ -14,7 +14,8 @@ function log(message) {
   Logger.log(message)
 }
 
-function fDate(date, format){//returns the date formatted with format, default to today if date not provided
+//returns the date formatted with format, default to today if date not provided
+function fDate(date, format){
   date = date || new Date();
   format = format || "MM/dd/yy";
   return Utilities.formatDate(new Date(date), Session.getScriptTimeZone(), format)
@@ -166,9 +167,6 @@ function escapeGasRegExString(re, escapeCharsArrOpt, ignoreCharsArrOpt){
 
   log(charsToReplace)
   for(var c in charsToReplace){
-    Logger.log(charsToReplace[c])
-    Logger.log( new RegExp(charsToReplace[c].replace('\[','\\['),'g').toString() )
-//    str = str.replace(new RegExp(charsToReplace[c].replace('\[','\\['),'g'), '\\$&')
     str = str.replace(charsToReplace[c], '\\$&')
   }
   

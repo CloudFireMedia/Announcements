@@ -1,5 +1,5 @@
 function runAllFormattingFunctions_oneWeekOut_(doc) {
-  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   paragraphs = doc.getBody().getParagraphs();
   formatFont_oneWeek_(doc);
 //  format_removeEmptyParagraphs_oneWeek(doc);
@@ -7,7 +7,7 @@ function runAllFormattingFunctions_oneWeekOut_(doc) {
 }
 
 function formatFont_oneWeek_(doc) {
-  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'))
+  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'))
   var body = doc.getBody();
   body.editAsText().setFontFamily('Lato');
   body.editAsText().setFontSize(9);
@@ -21,7 +21,7 @@ function formatFont_oneWeek_(doc) {
 }
 
 //function format_removeEmptyParagraphs_oneWeek(doc) { ///rewrite based on the upcoming sunday version
-//  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'))
+//  doc = doc || DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'))
 //  var body = doc.getBody();
 //  var paras = body.getParagraphs(); 
 //  for (var i = 0; i < paras.length; i++) { 

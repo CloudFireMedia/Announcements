@@ -37,8 +37,6 @@
 //    if( ! archiveDocInput.getResponseText() ) return;
 //    
 //    var archiveDocID = getIdFromUrl(archiveDocInput.getResponseText());
-////    Logger.log(archiveDocInput.getResponseText())
-////    Logger.log(archiveDocID)
 //    PropertiesService.getDocumentProperties().setProperty('archiveDocID', archiveDocID);
 //    config. files.announcements.archive = archiveDocID;
 //    

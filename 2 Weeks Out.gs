@@ -57,7 +57,7 @@
 //}
 
 //function moveNextSunday_to_thisSunday() {
-//  var docNextSunday = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+//  var docNextSunday = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
 //  var p = docNextSunday.getParagraphs();
 //  
 //  var docThisSunday = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
@@ -91,7 +91,7 @@
 //  var arr = documentName.split("-");
 //  var paraFirst = arr[0];
 //  
-//  var docNextSunday = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+//  var docNextSunday = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
 //  docNextSunday.setName(paraFirst);
 //  docNextSunday.getBody().clear();
 //  
@@ -111,7 +111,7 @@
 //    if (foundImage) continue;
 //    nextSundaybody.appendParagraph(p[i].copy());
 //  }
-//  applyFormattingToHeading(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+//  applyFormattingToHeading(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
 //  masterToDraft();
 //}
 
@@ -754,7 +754,7 @@ for the same reason, with the same rule about more recently edited content takin
 //This function will use Regex to match events
 function matchEvents() {
   
-  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
   
   var draftdoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
@@ -781,47 +781,38 @@ function matchEvents() {
     npa[npi].sort = false;
     
     //perform the regex match
-    // Logger.log(pt.getText()+"\n")
-    Logger.log('----------------');
     if ((ptt.match(mdr)) && !(ptt.match(mdr2))) {
       
       npa[npi].text = ptt; //store event text
       npa[npi].replace = true;
       md = mdr.exec(ptt); //store matched text in md
       npa[npi].event = md[0]; //and in event 
-      // Logger.log('EVENT:::'+npa[npi].event)
+      
       //work on EVENTS document
       for (var opi = 0; opi < opa.length; opi++) {
         //if event matches
         if (opa[opi].getText().indexOf(npa[npi].event) >= 0) {
-          Logger.log('Matched text para' + opa[opi].getText() + "\n")
+        
           //overwrite the event paragraph fetched from DRAFT doc with the one from EVENTS doc
           //npa[npi].paragraph=opa[opi].copy();
           npa[npi].paragraph = pt.copy();
           
           //text from reference document
           var txt = opa[opi].getText();
-          //       Logger.log("txt::"+txt);
           
           //in the reference paragraph , get only text succeeding the first semi colon (;)
           // txt = txt.substring(txt.indexOf(';') + 1, txt.length);
           txt = txt.replace(npa[npi].event, '');
-          Logger.log("txt!" + txt)
           //get current 
           //--------------------------------
           var body = draftdoc.getBody();
           var txtToReplace = ptt.substring(0, ptt.indexOf(';') + 1);
           //var ptText = txtToReplace + txt;
           var ptText = ptt + txt;
-          Logger.log("ptText:::" + ptText);
           
           var limit = ptt.length - 1;
-          Logger.log('limit' + limit)
           var att = pt.getAttributes();
-          Logger.log('att' + att)
           var par = body.insertParagraph(pi, ptText);
-          // var par = body.insertParagraph(pi, ptt);//new
-          Logger.log(par.getText().length - 1);
           
           var style = {};
           style[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] = pt.getAlignment();
@@ -833,16 +824,10 @@ function matchEvents() {
           style[DocumentApp.Attribute.SPACING_AFTER] = 10;
           style[DocumentApp.Attribute.SPACING_BEFORE] = 10;
           style[DocumentApp.Attribute.FOREGROUND_COLOR] = '#58585A';
-          Logger.log(' pt.getText().getForegroundColor();' + pt.getForegroundColor())
           par.setAttributes(style);
           par.editAsText().setBold(0, limit, true); //new
-          // par.appendText(txt);//new
-          
-          //par.setTextAlignment(pt.getTextAlignment())
           pt.removeFromParent();
-          //-------------------------------
-          
-          
+          //-------------------------------          
         }
       }
     }
@@ -882,7 +867,7 @@ function removeShortStartDates() {
 function modifyDatesInBody() {
   updateDatePrototype();
   Logger.clear();
-  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
   
   
@@ -890,7 +875,6 @@ function modifyDatesInBody() {
   
   //get fileName
   var filename = draftdoc.getName();
-  Logger.log(filename);
   //get date from file name
   var date = getDateInName(filename);
   //form matching templates
@@ -915,7 +899,6 @@ function modifyDatesInBody() {
   
   
   for (var t = 0; t < templates.length; t++) {
-    Logger.log("templates[" + t + "].SearchElement::" + templates[t].SearchElement)
     draftdoc.getBody().replaceText(templates[t].SearchElement, templates[t].ReplaceElement)
     //draftdoc.getBody().replaceText(templates[t].SearchElement,"REPLACED")
   }
@@ -925,37 +908,22 @@ function modifyDatesInBody() {
 
 //Creating templates to search in the document body and replace with the required Term.
 function createMatchTemplates(date) {
-  Logger.log("DATE::" + date);
+
   var templateReplaceArr = [' Today ', ' This Monday ', ' This Tuesday ', ' This Wednesday ', ' This Thursday ', ' This Friday ', ' This Saturday ', ' Next Sunday '];
   var templateArr = [];
   for (var i = 0; i <= 7; i++) {
     var tempDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     tempDate.setDate(date.getDate() + i);
-    // Logger.log('tempDate for i::'+ i +"::"+tempDate);
     var dayname = tempDate.getDayName();
     var replacementStr = ((i == 0) ? " Today " : (i == 7) ? " Next " + dayname : " This " + dayname);
-    // Logger.log("replacementStr"+replacementStr);
     //for(var j=1;j<=7;j++)
     //{ 
     var template = {};
     var regex = getDateRegex(dayname, tempDate.getMonth(), tempDate.getDate());
-    Logger.log('---regex---' + regex);
     template.SearchElement = regex;
     template.ReplaceElement = replacementStr;
     templateArr.push(template);
-    
-    //}
-    
   }
-  //Uncomment following code if want to see the template Array.
-  //Template is a collection of objects like [{SearchElement = x,ReplaceElement = y}]
-  
-  //  Logger.log('-------template arr----------');
-  // for(var ii = 0;ii<templateArr.length;ii++)
-  // {
-  // Logger.log(templateArr[ii]);
-  // }
-  //  Logger.log('-------template arr End----------');
   return templateArr;
 }
 
@@ -1051,24 +1019,22 @@ function getDateRegexStr(date) {
   
   return dateRegex;
 }
+
 //Takes file name , and returns the date mentioned in it , 
 //eg filename 'Copy of [ 10.01 ] Sunday Announcements ' will return Sunday, October 1 2017 00;00:000 
 function getDateInName(name) {
   var i1 = name.indexOf('[') + 1;
   var i2 = name.indexOf(']');
   var dateArr = name.substring(i1, i2).trim().split('.');
-  Logger.log('date1:' + dateArr[0] + "::" + dateArr[1]);
   // var date = new Date(new Date().getFullYear(),parseInt(dateArr[0])-1,parseInt(dateArr[1]));
   // var month = parseInt(dateArr[0].replace('0',''))-1;
   var month = parseInt(dateArr[0].indexOf('0') == 0 ? dateArr[0].replace('0', '') : dateArr[0]) - 1;
   // var day = parseInt(dateArr[1].replace('0',''));
   var day = parseInt(dateArr[1].indexOf('0') == 0 ? dateArr[1].replace('0', '') : dateArr[1]);
-  
-  Logger.log('month:' + month + 'Date:' + day);
   var date = new Date(new Date().getFullYear(), month, day);
-  Logger.log('date:' + date);
   return date;
 }
+
 //Update Javascript Date class to add prototype to get date in our desired format
 //1. Sunday, October 8
 //2. Sunday, Oct 8
@@ -1087,7 +1053,6 @@ function updateDatePrototype() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
     var dd = this.getDate();
     var dayno = this.getDay();
-    // Logger.log('DD::'+dd);
     var day = '';
     var month = ''
     
@@ -1110,7 +1075,6 @@ function updateDatePrototype() {
         dd
       ].join('');
       
-      // Logger.log(this+"<<::>>"+returnDate);
       return returnDate;
     }
     if (type == 6) {
@@ -1121,7 +1085,6 @@ function updateDatePrototype() {
         dd
       ].join('');
       
-      Logger.log(this + "<<::>>" + returnDate);
       return returnDate;
     }
     if (type == 7) {
@@ -1132,7 +1095,6 @@ function updateDatePrototype() {
         dd
       ].join('');
       
-      // Logger.log(this+"<<::>>"+returnDate);
       return returnDate;
     }
     var returnDate = [day + ', ',
@@ -1140,7 +1102,6 @@ function updateDatePrototype() {
                       dd
                      ].join('');
     
-    // Logger.log(this+"<<::>>"+returnDate);
     return returnDate;
   };
   

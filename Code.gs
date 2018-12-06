@@ -75,7 +75,6 @@ function insertRecurringContent(date, childIndex, doc) {
   date = date || new Date(); ///debug
   var body = doc.getBody();
   var recurringContent = getRecurringContent(doc);//{} with items parsed by directives i.e.: {first=[Paragraph],third=[Paragraph],date:{"2018-03-04":[Paragraph],}, ...}
-  //  Logger.log(recurringContent);return;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // Keys in recurringContent, present only when there are matching paragraphs, data is an array:
@@ -193,7 +192,6 @@ function getRecurringContent(doc){
     
   }
   
-//  Logger.log(output);
   return output;
 }
 

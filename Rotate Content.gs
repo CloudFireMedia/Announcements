@@ -96,11 +96,12 @@ function moveThisToMaster(){
   thisSundayDoc.setName(sundayTitles.thisSunday);
   
   format_master();///FIX  
-}
+  
+} // moveThisToMaster()
 
 function moveNextToThis(){
 
-  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   copyContent(fromDoc, toDoc);
     
@@ -117,7 +118,7 @@ function moveDraftToNext(){
   var sundayTitles = getWeekTitles();
   var title = getSundayOfMonthOrdinal(sundayTitles.dates.draftSunday) + ' Sunday of the month';
   var fromDoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEKS_SUNDAY_ID'));
+  var toDoc   = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
 
   copyContent(fromDoc, toDoc);
 
