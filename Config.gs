@@ -1,5 +1,5 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v0.1"
+var SCRIPT_VERSION = "v0.2"
 
 var TEST_GDOC_ID = '1T15-UJDbq85OgiOTfAnCqLbqVqabgRPeZBrILv_bJOI'; // Test Copy of [ 12.16 ] Sunday Announcements - Draft Document
 

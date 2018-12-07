@@ -76,18 +76,7 @@ function format_master_(doc) {
     for(var i=start; i<=end; i++) {
       if(paragraphs[i].getText().match(config.announcements.sundayPageRegEx)) continue;//don't mess with page titles
       paragraphs[i].setAttributes(config.announcements.format.past);
-    }
-    
-    //this section only affects the [text in brackets], but we want the entire paragraph formatted for this one
-    //  var eventTitleSearch = '^\\[.*?]';//find any string starting with [text in brackets]
-    //  var substringRange = lastSundayRange;//start from last Sunday and continue to end of doc
-    //  while( substringRange = body.findText(eventTitleSearch, substringRange) ){
-    //    //doc.setCursor(doc.newPosition(substringRange.getElement(), 0));return
-    //    var index = body.getChildIndex(substringRange.getElement().getParent());
-    //    if(substringRange.getElement().asText().getText().match(config.announcements.sundayPageRegEx)) continue;//don't mess with page titles
-    //    //    log(substringRange.getElement().asText().getText());
-    //    substringRange.getElement().asText().setAttributes(substringRange.getStartOffset(), substringRange.getEndOffsetInclusive(), config.announcements.format.past)
-    //  }
+    }    
   }
   
 } // format_master_()
