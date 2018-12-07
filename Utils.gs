@@ -172,5 +172,3 @@ function escapeGasRegExString(re, escapeCharsArrOpt, ignoreCharsArrOpt){
   
   return str;
 }
-
-
