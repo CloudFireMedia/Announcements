@@ -172,3 +172,111 @@ function escapeGasRegExString(re, escapeCharsArrOpt, ignoreCharsArrOpt){
   
   return str;
 }
+
+function getDateRegex(dayname, month, date) {
+  var regexStr = '';
+  var dayRegex = getDayRegexStr(dayname);
+  var monthRegex = getMonthRegexStr(month);
+  var dateRegex = getDateRegexStr(date);
+  //var dateRegex = '(' + date+  ')';
+  
+  //reference Regex /(Sun|Tues)[- \\/., ]+(Oct|October)[- \\/., ]+(10)/gim
+  regexStr = dayRegex + '[- /, ]*' + monthRegex + '[- /, ]*' + dateRegex;
+  
+  return regexStr;
+}
+
+function getDayRegexStr(dayname) {
+  switch (dayname) {
+    case 'Sunday':
+      return '(Sunday|Sunday.|Sun|Sun.| )';
+      break;
+    case 'Monday':
+      return '(Monday|Monday.|Mon|Mon.|Mo|Mo.| )';
+      break;
+    case 'Tuesday':
+      return '(Tuesday|Tuesday.|Tue|Tue.|Tues|Tues.| )';
+      break;
+    case 'Wednesday':
+      return '(Wednesday|Wednesday.|Wed|Wed.| )';
+      break;
+    case 'Thursday':
+      return '(Thursday|Th|Thur|Thu|Thrs|Thrs.|Thurs|Thurs.|Th.|TR|TR.| )';
+      break;
+    case 'Friday':
+      return '(Friday|Friday.|Fri|Fri.|FR|FR.| )';
+      break;
+    case 'Saturday':
+      return '(Saturday|Saturday.|Sat|Sat.| )';
+      break;
+  }
+}
+
+function getMonthRegexStr(month) {
+  switch (month) {
+    case 0:
+      return '(January|January.|Jan|Jan.|1\/)';
+      break;
+    case 1:
+      return '(February|February.|Feb|Feb.|2\/)';
+      break;
+    case 2:
+      return '(March|March.|Mar|Mar.|3\/)';
+      break;
+    case 3:
+      return '(April|April.|Apr|Apr.|4\/)';
+      break;
+    case 4:
+      return '(May|May.|5/)';
+      break;
+    case 5:
+      return '(June|June.|Jun|Jun.|6\/)';
+      break;
+    case 6:
+      return '(July|July.|Jul|Jul.|7\/)';
+      break;
+    case 7:
+      return '(August|August.|Aug|Aug.|8\/)';
+      break;
+    case 8:
+      return '(September|September.|Sep|Sep.|Sept|Sept.|9\/)';
+      break;
+    case 9:
+      return '(October|October.|Oct|Oct.|10/)';
+      break;
+    case 10:
+      return '(November|November.|Nov|Nov.|11\/)';
+      break;
+    case 11:
+      return '(December|December.|Dec|Dec.|12\/)';
+      break;
+      
+  }
+}
+
+function getDateRegexStr(date) {
+  var dateRegex = '';
+  //(19[ ]{1}|(19)+$)
+  if (parseInt(date) >= 1 && parseInt(date) <= 9) {
+    dateRegex = '(' + date + '[ ]{1}|' + '(' + date + ')+$' + ')';
+  } else {
+    dateRegex = '(' + date + ')';
+  }
+  
+  return dateRegex;
+}
+
+//Takes file name , and returns the date mentioned in it , 
+//eg filename 'Copy of [ 10.01 ] Sunday Announcements ' will return Sunday, October 1 2017 00;00:000 
+function getDateInName(name) {
+  var i1 = name.indexOf('[') + 1;
+  var i2 = name.indexOf(']');
+  var dateArr = name.substring(i1, i2).trim().split('.');
+  // var date = new Date(new Date().getFullYear(),parseInt(dateArr[0])-1,parseInt(dateArr[1]));
+  // var month = parseInt(dateArr[0].replace('0',''))-1;
+  var month = parseInt(dateArr[0].indexOf('0') == 0 ? dateArr[0].replace('0', '') : dateArr[0]) - 1;
+  // var day = parseInt(dateArr[1].replace('0',''));
+  var day = parseInt(dateArr[1].indexOf('0') == 0 ? dateArr[1].replace('0', '') : dateArr[1]);
+  var date = new Date(new Date().getFullYear(), month, day);
+  return date;
+}
