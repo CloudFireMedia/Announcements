@@ -280,3 +280,10 @@ function getDateInName(name) {
   var date = new Date(new Date().getFullYear(), month, day);
   return date;
 }
+
+function extractSundayTitle(doc){
+  var search = doc.getBody().findText(config.announcements.sundayPagePattern);
+  return search
+  ? search.getElement().asText().getText()
+  : null;
+}

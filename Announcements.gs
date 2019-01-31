@@ -60,7 +60,7 @@ function formatFont_oneWeek()                   {formatFont_oneWeek_()}
 // Draft Sunday (2 weeks)
 // ----------------------
 
-function sendMailFunction()                 {sendMailFunction_()}
+function inviteStaffSponsorsToComment()     {inviteStaffSponsorsToComment_()}
 function rotateContent()                    {rotateContent_()}
 // function moveSlides()                       {moveSlides_()} // 0 weeks
 function reorderParagraphs()                {reorderParagraphs_()}

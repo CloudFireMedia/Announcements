@@ -243,14 +243,15 @@ function draft_callFunctions_() {
     
 } // draft_callFunctions_()
 
-function sendMailFunction_() {
+function inviteStaffSponsorsToComment_() {
 
   var docSunday = DocumentApp.getActiveDocument();
   
   if (docSunday === null) {
-    docSunday = DocumentApp.openById(TEST_GDOC_ID);
+    docSunday = DocumentApp.openById(TEST_GDOC_ID_);
   }
-  
+
+  var documentId = docSunday.getId();
   var documentName = docSunday.getName();
   var arrnew = documentName.split("-");
   var paraFirst = arrnew[0];
@@ -269,8 +270,8 @@ function sendMailFunction_() {
   
     var emailList = "";
     var staffToEmail = makestaffMailList();
-    
-    var comments = ('' + getCommentsFromDocument()).toUpperCase();
+    var rawCommentData = Drive.Comments.list(documentId);
+    var commentsContent = ('' + getOpenCommentsContent()).toUpperCase();
     var emailListArray = [];
     
     for (data in staffToEmail) {
@@ -280,13 +281,17 @@ function sendMailFunction_() {
       var staffEmail = emailAddress[1];
       
       if (staffEmail != "") {
+      
         var res = findNameInDraft(staffName);
-        if (res || comments.indexOf(('' + staffName).toUpperCase()) > -1) //if staffname is in text || staffname is in a comment on the doc
-        emailListArray.push(staffEmail);
+        
+        //if staffname is in text || staffname is in a comment on the doc
+        if (res || commentsContent.indexOf(('' + staffName).toUpperCase()) > -1) { 
+          emailListArray.push(staffEmail);
+        }
       }      
     }
     
-    var commentArryRes = driveAPI();    
+    var commentArryRes = getStaffinFullComment();    
     var array3 = arrayUnique(emailListArray.concat(commentArryRes));
     var uniqueArray = (uniq(array3));
     for (em in uniqueArray) {
@@ -300,29 +305,27 @@ function sendMailFunction_() {
     // Private Functions
     // -----------------
 
-    function getCommentsFromDocument() {
-      var document_id = Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID');
-      var comments_list = Drive.Comments.list(document_id);
+    function getOpenCommentsContent() {
+    
       var comments = "";
       
-      for (var i = 0; i < comments_list.items.length; i++) {
-        if (comments_list.items[i].status == "open" && comments_list.items[i].deleted == false) {
-          comments += "  " + (comments_list.items[i].content)
+      for (var i = 0; i < rawCommentData.items.length; i++) {
+        if (rawCommentData.items[i].status == "open" && rawCommentData.items[i].deleted == false) {
+          comments += "  " + (rawCommentData.items[i].content)
         }
       }
       
       return comments;
     }
 
-    function driveAPI() { ///rename this to something that makes sense with what it's doing.
+    function getStaffinFullComment() { 
     
       var emailList = "";
-      var comments_list = Drive.Comments.list(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID')).items;
       var commentArray = [];
 
-      if (comments_list.length > 0) {
+      if (rawCommentData.length > 0) {
       
-        var newstr = JSON.stringify(comments_list);
+        var newstr = JSON.stringify(rawCommentData);
         var arr1 = newstr.split('{"content":"');
         var arr2 = arr1[1].split('","htmlContent');
         var att = arr2[0].split(",");
@@ -343,7 +346,7 @@ function sendMailFunction_() {
             nameToSearch = nameToSearch.trim();
             name = name.trim();
             if (nameToSearch == name) {
-              commentArray.push(values[i][8]);
+              commentArray.push(values[i][8]); // Email
             }
           }
         }
@@ -351,11 +354,11 @@ function sendMailFunction_() {
       
       return commentArray;
       
-    } // sendMailFunction_.checkName.driveAPI()    
+    } // inviteStaffSponsorsToComment_.checkName.getStaffinFullComment()    
     
-  } // sendMailFunction_.checkName()
+  } // inviteStaffSponsorsToComment_.checkName()
   
-} // sendMailFunction_()
+} // inviteStaffSponsorsToComment_()
 
 function sendDraftMailFinal(emailList, dateToSend) {
 
@@ -382,7 +385,7 @@ Thank you!<br><br>--<br>\
   });
 }
 
-function makestaffMailList() {///redo this to use getDataRange() then reduce to get needed output
+function makestaffMailList() { //redo this to use getDataRange() then reduce to get needed output
   var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
   var numRows = staffSheet.getLastRow();
   var staffRows = staffSheet.getSheetValues(3, 1, numRows, 2);

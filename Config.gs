@@ -1,7 +1,7 @@
 var SCRIPT_NAME = "Announcements"
 var SCRIPT_VERSION = "v0.2.dev_ajr"
 
-var TEST_GDOC_ID = '1T15-UJDbq85OgiOTfAnCqLbqVqabgRPeZBrILv_bJOI'; // Test Copy of [ 12.16 ] Sunday Announcements - Draft Document
+var TEST_GDOC_ID_ = '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58';
 
 var config = {
 
