@@ -1,3 +1,8 @@
+// v0.3
+// ----
+//
+// - Ignore old comments in "2 Weeks" doc on inviteStaffSponsorsToComment()
+
 // v0.2
 // ----
 //
