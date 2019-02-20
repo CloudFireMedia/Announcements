@@ -32,9 +32,11 @@ Note that the format requires the leading zero if the month or day is a single d
 */
 
 // Public API
-// ----------
+// ==========
 
 // Master Sunday
+// -------------
+
 function master_insertMonth()                {master_insertMonth_()}
 function master_insertWeeks()                {master_insertWeeks_()}
 function format_master()                     {format_master_()}
@@ -42,18 +44,34 @@ function showInstructions_Document()         {showInstructions_Document_()}
 function showInstructions_RecurringContent() {showInstructions_RecurringContent_()}
 
 // This (upcoming) Sunday (0 weeks)
+// --------------------------------
+
 function runAllFormattingFunctions_upcomingWeek() {runAllFormattingFunctions_upcomingWeek_()}
 function moveSlides()                             {moveSlides_()}
 function emailStaff()                             {emailStaff_()}
 function emailStaff_submit(executiveAssitant)     {emailStaff_submit_(executiveAssitant)}
 
 // Next Sunday (1 weeks)
+// ---------------------
+
 function runAllFormattingFunctions_oneWeekOut() {runAllFormattingFunctions_oneWeekOut_()}
 function formatFont_oneWeek()                   {formatFont_oneWeek_()}
 
 // Draft Sunday (2 weeks)
-function sendMailFunction() {sendMailFunction_()}
-function rotateContent()    {rotateContent_()}
+// ----------------------
+
+function inviteStaffSponsorsToComment()     {inviteStaffSponsorsToComment_()}
+function rotateContent()                    {rotateContent_()}
+// function moveSlides()                       {moveSlides_()} // 0 weeks
+function reorderParagraphs()                {reorderParagraphs_()}
+function removeShortStartDates()            {removeShortStartDates_()}
+function draft_callFunctions()              {draft_callFunctions_()}
+function matchEvents()                      {matchEvents_()}
+function modifyDatesInBody()                {modifyDatesInBody_()}
+function countInstancesofLiveAnnouncement() {countInstancesofLiveAnnouncement_()}
+function cleanInstancesofLiveAnnouncement() {cleanInstancesofLiveAnnouncement_()}
 
 // Archive
+// -------
+
 function formatFont_archive() {formatFont_archive_()}
