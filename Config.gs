@@ -1,5 +1,5 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v0.3"
+var SCRIPT_VERSION = "v0.3.1"
 
 var TEST_GDOC_ID_ = '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58';
 
