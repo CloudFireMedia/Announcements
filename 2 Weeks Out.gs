@@ -742,11 +742,12 @@ function cleanInstancesofLiveAnnouncement_() {
   var docID = doc.getId();
   var body = doc.getBody();
   body.editAsText().replaceText('[0-9]+\\s✅\\s', "");
-  //  doc.saveAndClose();
   
 } // cleanInstancesofLiveAnnouncement_()
 
 function countInstancesofLiveAnnouncement_() {
+
+  cleanInstancesofLiveAnnouncement_()
   
   var regE = new RegExp('\\[\\s([^\\|]*)\\s\\|\\s([^\\]]*)\\s\\]', 'ig');
   
@@ -758,19 +759,16 @@ function countInstancesofLiveAnnouncement_() {
   
   for (var i = 0; i < paragraphs.length; i++) {
     
-    var parag = paragraphs[i]
-    
+    var parag = paragraphs[i]   
     var parString = parag.getText();
     var matches = parString.match(regE);
-    
     var match;
     
     if (match = regE.exec(parString)) {
     
       var event = match[1];
       
-      if (('' + event).trim().toUpperCase() != "EVENT NAME") {
-      
+      if (('' + event).trim().toUpperCase() != "EVENT NAME") {      
         var counter = 0;
         counter = counter + searchUpcoming(event);
         counter = counter + searchOneWeek(event);
