@@ -23,13 +23,13 @@ Do you want to continue?\
     }
   }
   
-  moveThisToMaster();    // This   -> Master (check in)
-//  moveNextToThis();      // Next   -> This
-//  moveDraftToNext();     // Draft  -> Next
-//  moveMasterToDraft();   // Master -> Draft (check out)
-//  moveOldestToArchive(); // Master -> Archive (oldest)
+  moveThisToMaster();    // This (week 0) -> Master (check in)
+  moveNextToThis();      // Next (week 1) -> This (week 0)
+  moveDraftToNext();     // Draft (week 2) -> Next (week 1)
+  moveMasterToDraft();   // Master -> Draft (check out)
+  moveOldestToArchive(); // Master -> Archive (oldest)
 
-  return
+  return;
   
   // Private Functions
   // -----------------
@@ -98,7 +98,7 @@ Do you want to continue?\
     var sundayTitles = getWeekTitles();
     thisSundayDoc.setName(sundayTitles.thisSunday);
     
-    format_master();///FIX  
+    format_master_(masterDoc);
     
   } // moveThisToMaster()
   
@@ -200,8 +200,7 @@ Do you want to continue?\
     .insertParagraph(hruleIndex+1, config.announcements.placeholder)
     .setAlignment(DocumentApp.HorizontalAlignment.LEFT)
     .setAttributes({ITALIC : false, BOLD : false});
-  
-    
+      
   //  format_master();///FIX
   }
   
@@ -216,9 +215,9 @@ Do you want to continue?\
     var paragraphs = body.getParagraphs();
     
     //first, let's cleanup the doc to avoid moving blank paragraphs
-    format_master_();///FIX
+    format_master_(doc);///FIX
     
-    //get the index of the page to begin archive from - currently only the last page of annoucements
+    //get the index of the page to begin archive from - currently only the last page of announcements
     //could be changed to accept user date input or start from cursor location page
     for(var p=paragraphs.length-1; p>=0; p--) {//search from end for match - there's no inbuilt method for this
       if( ! paragraphs[p].getText().match(config.announcements.sundayPageRegEx)) continue;//we're looking for page titles, skip anything else
@@ -302,46 +301,37 @@ Do you want to continue?\
 
 } // rotateContent_()
 
-//Redevelopment notes:  
-  //                      - moveSlides function would be more accurately titled if it were called something like copySlides
-  //                      - moveSlides should search the children of [Recurring Content](https://drive.google.com/drive/folders/1fy7tXK8ta6SpQAC2R1Xex35gIOW78SUp) folder  
-  //                        as source folders in addition to the current source folder, which is [Pre- and Post- Service Slides](https://drive.google.com/drive/folders/0BzM8_MjdRURAXzlyVVNMdmpYLVU)
-  //                      - moveSlides should be called on a timed trigger between 11:00:00 - 11:59:59 GMT-6 on Fridays (as midnight on Friday is the cutoff for staff to change content in This Sunday Announcements script)
-  //                      - however, it can also be called manually, in which case... 
-  //                        - the notification in lines 8 - 13 ONLY applies to the moveSlides function; no other functions should call this notification
-  //                        - moveSlides should ONLY be able to run manually WITHOUT the notification in lines 8 - 13 ... 
-  //                           IF the time now is NOT between between 00:00:01 GMT-6 Saturday - 12:00:00 GMT-6 Sunday;  
-  //                           IF the filename of ['This Sunday' doc](https://docs.google.com/document/d/1U61THQS-Ktno-Ku1Jk6GX0UaSmsRgq4YGiJzePJleyo/edit) contains the date for this coming Sunday or today().
-  //                           ELSE the notification should not appear
-
 //delete all content in the destination folder and copy service slides corresponding to the 
 //events written in 'This Sunday's Announcements' doc to the destination folder
 
-function moveSlides_() {
-  log('Start: moveSlides()')
+function copySlides_() {
+  log('Start: copySlides_()')
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   var text = doc.getBody().editAsText().getText();
   var announcementStartRegEx = /\[[^\|\]]+\|/g;
   var fileTitleArray = [];
   
-  while (fileTitleMatch = announcementStartRegEx.exec(text))//removes the first and last characters, ie: the [ and | from the above (but oddly leaves the spaces)
-  fileTitleArray.push(fileTitleMatch[0].replace(/(^. *| *.$)/g, '') );//removes [, | and any spaces
+  //removes the first and last characters, ie: the [ and | from the above (but oddly leaves the spaces)
+  while (fileTitleMatch = announcementStartRegEx.exec(text))
+  
+  //removes [, | and any spaces
+  fileTitleArray.push(fileTitleMatch[0].replace(/(^. *| *.$)/g, '') );
   
   var folderSource = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_SOURCE_ID'));
   var folderDestination = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_DESTINATION_ID'));
-  if( ! folderSource) err('Unable to open source folder for slides.')
-  if( ! folderDestination) err('Unable to open destination folder for slides.')
+  if( ! folderSource) throw new Error('Unable to open source folder for slides.')
+  if( ! folderDestination) throw new Error('Unable to open destination folder for slides.')
   if( ! (folderSource && folderDestination)) return;
   
   //delete existing files
   var filesDestination = folderDestination.getFiles();
-  if( ! filesDestination) err('Unable to access slide destination folder')
+  if( ! filesDestination) throw new Error('Unable to access slide destination folder')
   try{
     while (filesDestination.hasNext()) {
       filesDestination.next().setTrashed(true);
     }
   }catch(e){
-    err('Unable to delete old files from slide destination folder')
+    throw new Error('Unable to delete old files from slide destination folder')
   }
   
   //copy this weeks files to folder
@@ -360,9 +350,9 @@ function moveSlides_() {
       }
     }
   } catch(e){
-    err('Unable to copy slides to destination folder')
+    throw new Error('Unable to copy slides to destination folder')
   }
   
-  log('End: moveSlides()')
+  log('End: copySlides_()')
   
-} // moveSlides_()
+} // copySlides_()

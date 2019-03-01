@@ -446,25 +446,22 @@ function reorderParagraphs_() {
     if (ptt.match(mdr)) {
       md = mdr.exec(ptt);
       npa[npi].md = parseFloat(md[2]);
-      //npa[npi].paragraph.replaceText(mdr2,md[1]);
-      //ptt=npa[npi].paragraph.getText();
       npa[npi].text = ptt;
       npa[npi].sort = true;
-      //npa[npi].md='';//parseFloat(md[0].replace(/^\[[^\]\|]+\|[^\]]+\][^01-9]+([01-9]+\.[01-9]+)[^01-9]/gi,'$1'));
     }
     npi++;
   }
-  var sdfa = '112';
   var tp = '';
   for (npi = 0; npi < npa.length; npi++) {
     if (npa[npi].sort == true) {
       var tpi = npi;
-      for (var npi2 = npi + 1; npi2 < npa.length; npi2++)
+      for (var npi2 = npi + 1; npi2 < npa.length; npi2++) {
         if (npa[npi2].sort == true) {
           if (npa[npi2].md < npa[tpi].md) {
             tpi = npi2;
           }
         }
+      }
       if (tpi != npi) {
         tp = npa[npi];
         npa[npi] = npa[tpi];
@@ -473,20 +470,14 @@ function reorderParagraphs_() {
     }
   }
   doc.getBody().appendParagraph("");
-  var asdf = '';
   for (var pi = 0; pi < pa.length; pi++) {
-    //pa[pi].removeFromParent();//doc.getBody().removeChild(pa[pi]);
     doc.getBody().removeChild(pa[pi]);
   }
-  var asdff = '';
   for (npi = 0; npi < npa.length; npi++) {
     doc.getBody().appendParagraph(npa[npi].paragraph);
   }
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
-  var asdffff = '';
-}
-
-
+} // reorderParagraphs_()
 
 /* Redevelopment note: it would be great if this script would also reference 
 'This Sunday's Announcements' as well as 'Next Sunday's Announcements' as the
@@ -742,11 +733,12 @@ function cleanInstancesofLiveAnnouncement_() {
   var docID = doc.getId();
   var body = doc.getBody();
   body.editAsText().replaceText('[0-9]+\\s✅\\s', "");
-  //  doc.saveAndClose();
   
 } // cleanInstancesofLiveAnnouncement_()
 
 function countInstancesofLiveAnnouncement_() {
+
+  cleanInstancesofLiveAnnouncement_()
   
   var regE = new RegExp('\\[\\s([^\\|]*)\\s\\|\\s([^\\]]*)\\s\\]', 'ig');
   
@@ -758,19 +750,16 @@ function countInstancesofLiveAnnouncement_() {
   
   for (var i = 0; i < paragraphs.length; i++) {
     
-    var parag = paragraphs[i]
-    
+    var parag = paragraphs[i]   
     var parString = parag.getText();
     var matches = parString.match(regE);
-    
     var match;
     
     if (match = regE.exec(parString)) {
     
       var event = match[1];
       
-      if (('' + event).trim().toUpperCase() != "EVENT NAME") {
-      
+      if (('' + event).trim().toUpperCase() != "EVENT NAME") {      
         var counter = 0;
         counter = counter + searchUpcoming(event);
         counter = counter + searchOneWeek(event);

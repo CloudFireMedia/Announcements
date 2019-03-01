@@ -47,7 +47,7 @@ function showInstructions_RecurringContent() {showInstructions_RecurringContent_
 // --------------------------------
 
 function runAllFormattingFunctions_upcomingWeek() {runAllFormattingFunctions_upcomingWeek_()}
-function moveSlides()                             {moveSlides_()}
+function copySlides()                             {copySlides_()}
 function emailStaff()                             {emailStaff_()}
 function emailStaff_submit(executiveAssitant)     {emailStaff_submit_(executiveAssitant)}
 
@@ -62,7 +62,7 @@ function formatFont_oneWeek()                   {formatFont_oneWeek_()}
 
 function inviteStaffSponsorsToComment()     {inviteStaffSponsorsToComment_()}
 function rotateContent()                    {rotateContent_()}
-// function moveSlides()                       {moveSlides_()} // 0 weeks
+// function copySlides()                       {copySlides_()} // 0 weeks
 function reorderParagraphs()                {reorderParagraphs_()}
 function removeShortStartDates()            {removeShortStartDates_()}
 function draft_callFunctions()              {draft_callFunctions_()}

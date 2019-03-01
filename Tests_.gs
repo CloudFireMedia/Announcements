@@ -1,3 +1,11 @@
+function test_reorderParagraphs() {
+  reorderParagraphs_()
+}
+
+function test_copySlides() {
+  copySlides_()
+}
+
 function test_inviteStaffSponsorsToComment() {
   inviteStaffSponsorsToComment_()
 }
