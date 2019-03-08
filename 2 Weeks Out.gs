@@ -305,26 +305,110 @@ function inviteStaffSponsorsToComment_() {
     // Private Functions
     // -----------------
 
+    function sendDraftMailFinal(emailList, dateToSend) {
+    
+      if (emailList === '') {
+        log('No emails sent')
+        return;
+      }
+      
+      var sundayAnnouncementsDraftDocumentUrl = DocumentApp.openById(documentId).getUrl();
+      var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", dateToSend);
+      var body = Utilities.formatString("Dear Event Sponsor: <br><br> \
+    Please review the document linked below regarding promotion for your upcoming event.<br><br>\
+    You are invited to suggest changes to your event's promotion by typing directly in the document by Friday EOD. <br><br>\
+    Thank you!<br><br>--<br>\
+    <a href='%s'>[ %s ] Sunday Announcement draft</a>", 
+                                        sundayAnnouncementsDraftDocumentUrl,
+                                        dateToSend
+                                       );
+      emailList = emailList.replace(/\,$/, ''); //should build the list without the trailing comma in the first place
+      
+      MailApp.sendEmail({
+        to: emailList,
+        subject: subject,
+        htmlBody: body
+      });
+      
+      storeScriptRunTime();
+      
+      log('Emails sent to ' + emailList)
+      
+      // Private Functions
+      // -----------------
+      
+      function storeScriptRunTime() {
+      
+        var comments = Drive.Comments.list(documentId);
+        
+        if (comments.items && comments.items.length > 0) {
+        
+          for (var i = 0; i < comments.items.length; i++) {
+          
+            var comment = comments.items[i]
+            var content = comment.content
+            
+            if (content.indexOf(config.scriptLastRunText) !== -1) {            
+              var resource = {content: config.scriptLastRunText + new Date()}
+              Drive.Comments.patch(resource, documentId, comment.commentId)
+            }
+          }
+        }  
+        
+      } // sendDraftMailFinal.storeScriptRunTime()
+      
+    } // sendDraftMailFinal()
+
+    /**
+     * Get comments content if it passes the various criteria described
+     */
+
     function getOpenCommentsContent() {
     
       var commentsContent = "";
-      var NUMBER_OF_MS_IN_A_WEEK = 7 * 24 * 60 * 60 * 1000
-      var thisDayLastWeek = new Date(new Date().getTime() - NUMBER_OF_MS_IN_A_WEEK)
+      var lastTimeScriptRun = getLastTimeScriptRun()
 
       for (var i = 0; i < rawCommentData.items.length; i++) {
       
         var nextComment = rawCommentData.items[i]        
         var modifiedDate = new Date(nextComment.modifiedDate)
         
-        if (nextComment.status === "open" && 
+        if (nextComment.content.indexOf(config.scriptLastRunText) === -1 && 
+            nextComment.status === "open" && 
             !nextComment.deleted && 
-            modifiedDate > thisDayLastWeek) {
+            modifiedDate > lastTimeScriptRun) {
+            
           commentsContent += "  " + (nextComment.content)
         }
       }
       
       return ('' + commentsContent).toUpperCase();
-    }
+      
+      // Private Functions
+      // -----------------
+      
+      function getLastTimeScriptRun() {
+      
+        var datetime = new Date(0); // 1970 - not run yet
+        var comments = Drive.Comments.list(documentId);
+        
+        if (comments.items && comments.items.length > 0) {
+        
+          for (var i = 0; i < comments.items.length; i++) {
+          
+            var content = comments.items[i].content;
+            
+            if (content.indexOf(config.scriptLastRunText) !== -1) {           
+              datetime = new Date(content.slice(config.scriptLastRunTextLength));
+            }
+          }
+        } 
+        
+        return datetime
+        
+      } // getOpenCommentsContent.getLastTimeScriptRun()
+
+    } // getOpenCommentsContent()
 
     function getStaffinFullComment() { 
     
@@ -367,34 +451,6 @@ function inviteStaffSponsorsToComment_() {
   } // inviteStaffSponsorsToComment_.checkName()
   
 } // inviteStaffSponsorsToComment_()
-
-function sendDraftMailFinal(emailList, dateToSend) {
-
-  if (emailList === '') {
-    log('No emails sent')
-    return;
-  }
-
-  var sundayAnnouncementsDraftDocumentUrl = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID')).getUrl();
-  var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", dateToSend);
-  var body = Utilities.formatString("Dear Event Sponsor: <br><br> \
-Please review the document linked below regarding promotion for your upcoming event.<br><br>\
-You are invited to suggest changes to your event's promotion by typing directly in the document by Friday EOD. <br><br>\
-Thank you!<br><br>--<br>\
-<a href='%s'>[ %s ] Sunday Announcement draft</a>", 
-                                    sundayAnnouncementsDraftDocumentUrl,
-                                    dateToSend
-                                   );
-  emailList = emailList.replace(/\,$/, ''); //should build the list without the trailing comma in the first place
-  
-  MailApp.sendEmail({
-    to: emailList,
-    subject: subject,
-    htmlBody: body
-  });
-  
-  log('Emails sent to ' + emailList)
-}
 
 function makestaffMailList() { //redo this to use getDataRange() then reduce to get needed output
   var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));

@@ -5,6 +5,9 @@ var TEST_GDOC_ID_ = '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58';
 
 var config = {
 
+  scriptLastRunText: 'Script last run: ',
+  scriptLastRunTextLength: 16,
+
   announcements: { // Legacy
 
     placeholder : '{{CONTENT IN ROTATION}}',
