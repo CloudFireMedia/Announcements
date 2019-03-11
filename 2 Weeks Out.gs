@@ -578,7 +578,7 @@ function reorderParagraphs_() {
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
 } // reorderParagraphs_()
 
-function matchEvents_() {
+function updateWeek2EventDescriptions_() {
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
@@ -666,7 +666,7 @@ function matchEvents_() {
     npi++;
   }
   
-} // matchEvents_()
+} // updateWeek2EventDescriptions_()
 
 function removeShortStartDates_() {
 

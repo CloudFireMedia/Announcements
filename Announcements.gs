@@ -66,7 +66,7 @@ function rotateContent()                    {rotateContent_()}
 function reorderParagraphs()                {reorderParagraphs_()}
 function removeShortStartDates()            {removeShortStartDates_()}
 function formatGDoc()                       {formatGDoc_()}
-function matchEvents()                      {matchEvents_()}
+function updateWeek2EventDescriptions()     {updateWeek2EventDescriptions_()}
 function modifyDatesInBody()                {modifyDatesInBody_()}
 function countInstancesofLiveAnnouncement() {countInstancesofLiveAnnouncement_()}
 function cleanInstancesofLiveAnnouncement() {cleanInstancesofLiveAnnouncement_()}
