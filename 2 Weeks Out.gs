@@ -38,27 +38,39 @@ function getFirstParagraph(doc) {
   return 'Not Found';
 }
 
-function draft_callFunctions_() {
+function formatGDoc_() {
 
-  draft_removeRowReferences();
-  draft_mergeParagraph();
-  draft_formatParagraph();
-  draft_boldBetweenSquareBrackets();
-  draft_highlightStaffSponsorNames();
+  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
+  var body = doc.getBody();
+  var paras = body.getParagraphs();
+  var length = paras.length;
+
+//  removeRowReferences();
+//  mergeParagraph();
+//  formatParagraph();
+//  boldBetweenSquareBrackets();
+  highlightStaffSponsorNames();
   
   return;
   
   // Private Functions
   // -----------------
   
-  function draft_removeRowReferences() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
-    var length = paras.length;
+  /**
+   * Remove the row reference from the event title: [ title | row ref | sponsor name ]
+   */
+   
+  // TODO - Although the filtering is done the new title is never written back to the 
+  // GDoc - https://trello.com/c/orpc2fz4/534-removerowreference-doesnt
+   
+  function removeRowReferences() {
+  
     for (i = 0; i < length; ++i) {
+    
       var str = paras[i].getText();
-      if (str.indexOf("of the month") == -1) {
+      
+      if (str.indexOf("of the month") === -1) {
+      
         var arr = str.split("]");
         var str1 = arr[0];
         const regex = /\|.*\|/g;
@@ -68,12 +80,16 @@ function draft_callFunctions_() {
         var found = 0;
         
         if (arr[1] != "" && arr[1] != undefined) {
+        
           found = 1;
           var result = str1 + "]" + arr[1];
+          
         } else {
+        
           if (str1 != undefined) {
+          
             found = 1;
-            if (str.indexOf("]") != -1) {
+            if (str.indexOf("]") !== -1) {
               var result = str1 + "]";
             } else {
               var result = str1;
@@ -92,29 +108,40 @@ function draft_callFunctions_() {
       }
     }
     
-  } // draft_callFunctions_.draft_removeRowReferences()
+  } // formatGDoc_.removeRowReferences()
 
-  function draft_mergeParagraph() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
+  /**
+   * 
+   */
+
+  function mergeParagraph() {
+  
     var textLocation = {};
     var i;
-    var length = paras.length;
     var cnt = 0;
-    //Merge Paragraph
+    
     for (i = 0; i < length; ++i) {
+    
       var paraText = paras[i].getText();
+      
       if (paraText != "") {
+      
         if (cnt != 0) {
+        
           paraText = paraText.trim();
-          if (paraText.indexOf(">>") == 0 || paraText.indexOf(">>") == 1 || paraText.indexOf(">>") == 2 || paraText.indexOf(">>") == 3 || paraText.indexOf(">>") == 4) {
+          
+          if (paraText.indexOf(">>") == 0 || 
+              paraText.indexOf(">>") == 1 || 
+              paraText.indexOf(">>") == 2 || 
+              paraText.indexOf(">>") == 3 ||
+              paraText.indexOf(">>") == 4) {
+          
             var paraTextPrevious = paras[i - 1].getText();
             paraTextPrevious = paraTextPrevious.replace(/[\r\n]/g, "");
             paraText = paraText.replace(/[\r\n]/g, "");
-            //paraTextPrevious=paraTextPrevious.replace("\n","");
             var newParaText = paraTextPrevious + "\n" + paraText;
             paras[i - 1].setText(newParaText);
+            
             if (length - 1 == i) {
               paras[i].setText(".");
             } else {
@@ -124,22 +151,29 @@ function draft_callFunctions_() {
             }
           }
         }
+        
         cnt++;
       }
     }
     
-  } // draft_callFunctions_.draft_mergeParagraph()
+  } // formatGDoc_.mergeParagraph()
   
-  function draft_formatParagraph() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
-    //Format Heading
+  /**
+   * Set headings and paragraphs to standard formatting.
+   */
+  
+  function formatParagraph() {
+  
     var cnt = 0;
-    for (i = 0; i < paras.length; ++i) {
+    
+    for (i = 0; i < length; ++i) {
+    
       var paraText = paras[i].getText();
+      
       if (paraText != "") {
+      
         if (cnt == 0) {
+        
           var headingStyle = {};
           headingStyle[DocumentApp.Attribute.BOLD] = false;
           headingStyle[DocumentApp.Attribute.FONT_SIZE] = 9;
@@ -147,8 +181,11 @@ function draft_callFunctions_() {
           headingStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Lato';
           paras[i].setAttributes(headingStyle);
           paras[i].setHeading(DocumentApp.ParagraphHeading.HEADING2);
+          
         } else {
+        
           var bodyStyle = {};
+          
           bodyStyle[DocumentApp.Attribute.BOLD] = false;
           bodyStyle[DocumentApp.Attribute.FONT_SIZE] = 9;
           bodyStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Lato';
@@ -161,52 +198,55 @@ function draft_callFunctions_() {
           paras[i].setAttributes(bodyStyle);
           paras[i].setAlignment(DocumentApp.HorizontalAlignment.LEFT);
         }
+        
         cnt++;
+        
       } else {
+      
         if (cnt > 1) {
           try {
             paras[i].removeFromParent();
-          } catch (e) {}
-          
+          } catch (e) {}          
         }
       }
     }
     
-  } // draft_callFunctions_.draft_formatParagraph()
+  } // formatGDoc_.formatParagraph()
   
-  function draft_boldBetweenSquareBrackets() {
+  function boldBetweenSquareBrackets() {
+  
     var startTag = "[\[]";
     var endTag = "[\]]";
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var para = body.getParagraphs();
     var i = 0;
-    for (i in para) {
-      var from = para[i].findText(startTag);
-      var to = para[i].findText(endTag, from);
+    
+    for (i = 0; i < length; ++i) {
+    
+      var from = paras[i].findText(startTag);
+      var to = paras[i].findText(endTag, from);
+      
       if ((to != null && from != null) && ((to.getStartOffset()) - (from.getStartOffset() + startTag.length) > 0)) {
-        para[i].editAsText().setBold(from.getStartOffset(), to.getStartOffset(), true);
+        paras[i].editAsText().setBold(from.getStartOffset(), to.getStartOffset(), true);
       }
     }
     
-  } // draft_callFunctions_.draft_boldBetweenSquareBrackets()
+  } // formatGDoc_.boldBetweenSquareBrackets()
   
-  function draft_highlightStaffSponsorNames() {
+  function highlightStaffSponsorNames() {
   
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
     var textToHighlight = checkStaffDataSheet();
     var highlightStyle = {};
     highlightStyle[DocumentApp.Attribute.BACKGROUND_COLOR] = '#FCFC00';
     highlightStyle[DocumentApp.Attribute.BOLD] = true;
-    var paras = body.getParagraphs();
     var textLocation = {};
     var i;
     
-    for (i = 0; i < paras.length; ++i) {
+    for (i = 0; i < length; ++i) {
+    
       for (d in textToHighlight) {
+      
         var textToFind = textToHighlight[d];
         textLocation = paras[i].findText(textToFind);
+        
         if (textLocation != null && textLocation.getStartOffset() != -1) {
           textLocation.getElement().setAttributes(textLocation.getStartOffset(), textLocation.getEndOffsetInclusive(), highlightStyle);
         }
@@ -219,6 +259,7 @@ function draft_callFunctions_() {
     // -----------------
     
     function checkStaffDataSheet() {
+    
       var staffArray = [];
       var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
       var lastRow = staffSheet.getLastRow();
@@ -227,21 +268,23 @@ function draft_callFunctions_() {
       var staffFromSheet = "";
       
       var cnt = 0;
+      
       for (var row in staffRows) {
+      
         if (staffRows[row][0] != "") {
           staffFromSheet = staffRows[row][0] + ' ' + staffRows[row][1];
-          staffArray.push(staffFromSheet);
-          
+          staffArray.push(staffFromSheet);      
         }
         cnt++;
       }
+      
       return staffArray;
       
-    } // draft_callFunctions_.draft_highlightStaffSponsorNames.checkStaffDataSheet()
+    } // formatGDoc_.highlightStaffSponsorNames.checkStaffDataSheet()
     
-  } // draft_callFunctions_.draft_highlightStaffSponsorNames()
+  } // formatGDoc_.highlightStaffSponsorNames()
     
-} // draft_callFunctions_()
+} // formatGDoc_()
 
 function inviteStaffSponsorsToComment_() {
 
@@ -535,22 +578,15 @@ function reorderParagraphs_() {
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
 } // reorderParagraphs_()
 
-/* Redevelopment note: it would be great if this script would also reference 
-'This Sunday's Announcements' as well as 'Next Sunday's Announcements' as the
-source doc. If two matches are found, the more recently edited version should be used 
-(i.e.the version on 'Next Sunday's Announcements'). Even better would be if this script
-could ALSO reference all pages dated 8 weeks prior to this Sunday on the Master Doc 
-for the same reason, with the same rule about more recently edited content taking priority.
-*/
-//This function will use Regex to match events
 function matchEvents_() {
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
   
   var draftdoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
+  
   //will return Paragraph array
-  var pa = draftdoc.getBody().getParagraphs(); //contains event and style content
+  var draftDocParagraphArray = draftdoc.getBody().getParagraphs(); //contains event and style content
   var npa = [];
   var npi = 0;
   var md = '';
@@ -558,14 +594,17 @@ function matchEvents_() {
   //var mdr2=/^\[[^\]\|]+\|[^\]]+\][^01-9]+([01-9]+\.[01-9]+)[^01-9].*[a-z]+/gi ;
   
   //Build regex object
-  var mdr = /^\[([^\]\|]+\|[^\]]+)\]/gi;
-  var mdr2 = /^\[[^\]\|]+\|[^\]]+\].*[a-z]+/gi;
+  var mdr = /^\[([^\]\|]+\|[^\]]+)\]/gi; // [ ... | ... ]
+  var mdr2 = /^\[[^\]\|]+\|[^\]]+\].*[a-z]+/gi; // [ ... | ... ] ...
   var mdrblank = /[a-z]+/gi;
   
   //DRAFT DOC:  iterate through the paragraph array
+  
   draftdoc.getBody().appendParagraph(" ");
-  for (var pi = 0; pi < pa.length; pi++) {
-    var pt = pa[pi];
+  
+  for (var pi = 0; pi < draftDocParagraphArray.length; pi++) {
+  
+    var pt = draftDocParagraphArray[pi];
     var ptt = pt.getText(); //get paragraph text as String
     npa[npi] = {};
     npa[npi].paragraph = pt;
@@ -581,6 +620,7 @@ function matchEvents_() {
       
       //work on EVENTS document
       for (var opi = 0; opi < opa.length; opi++) {
+      
         //if event matches
         if (opa[opi].getText().indexOf(npa[npi].event) >= 0) {
         
@@ -594,6 +634,7 @@ function matchEvents_() {
           //in the reference paragraph , get only text succeeding the first semi colon (;)
           // txt = txt.substring(txt.indexOf(';') + 1, txt.length);
           txt = txt.replace(npa[npi].event, '');
+          
           //get current 
           //--------------------------------
           var body = draftdoc.getBody();
@@ -631,15 +672,20 @@ function removeShortStartDates_() {
 
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
   var paras = doc.getBody().getParagraphs();
-  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;//matches: "[ foo | bar ] 05.29 ; " or "[ foo | bar ] << baz 05.29 >>; " capturing the portion after [ ]
+  
+  //matches: "[ foo | bar ] 05.29 ; " or "[ foo | bar ] << baz 05.29 >>; " capturing the portion after [ ]
+  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;
   
   for (var p in paras) {
   
     var text = paras[p].getText();
-    var match = new RegExp(re).exec(text);//MUST use a new regexp each check or the next check picks up after the previous (making no match size it skips the one at 0)
     
-    if(match)
+    //MUST use a new regexp each check or the next check picks up after the previous (making no match size it skips the one at 0)
+    var match = new RegExp(re).exec(text);
+    
+    if (match) {
       paras[p].replaceText(match[1].replace('\[','\\[').replace('\|','\\|').replace('\]','\\]'), ' ');
+    }
   }
 }
 

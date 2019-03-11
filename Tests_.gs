@@ -1,3 +1,20 @@
+function test_modifyDatesInBody() {
+  modifyDatesInBody_()
+  return
+}
+
+function test_formatGDoc() {
+  formatGDoc_()
+  return
+}
+
+function test_short() {
+  var text = '[ title | FN1 LN1 ] 01.01;'
+  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;
+  var match = new RegExp(re).exec(text);
+  return
+}
+
 function test_reorderParagraphs() {
   reorderParagraphs_()
 }

@@ -65,7 +65,7 @@ function rotateContent()                    {rotateContent_()}
 // function copySlides()                       {copySlides_()} // 0 weeks
 function reorderParagraphs()                {reorderParagraphs_()}
 function removeShortStartDates()            {removeShortStartDates_()}
-function draft_callFunctions()              {draft_callFunctions_()}
+function formatGDoc()                       {formatGDoc_()}
 function matchEvents()                      {matchEvents_()}
 function modifyDatesInBody()                {modifyDatesInBody_()}
 function countInstancesofLiveAnnouncement() {countInstancesofLiveAnnouncement_()}
