@@ -286,6 +286,10 @@ function formatGDoc_() {
     
 } // formatGDoc_()
 
+/**
+ * Search the document and comment text for staff to email for comments
+ */
+
 function inviteStaffSponsorsToComment_() {
 
   var docSunday = DocumentApp.getActiveDocument();
@@ -295,60 +299,96 @@ function inviteStaffSponsorsToComment_() {
   }
 
   var documentId = docSunday.getId();
-  var documentName = docSunday.getName();
-  var arrnew = documentName.split("-");
+  var arrnew = docSunday.getName().split("-");
   var paraFirst = arrnew[0];
   var str = arrnew[0];
   var arr = str.split("[");
   var arr1 = arr[1].split("]");
-  var datestr = arr1[0].trim();
-  checkName(datestr);
+  var documentShortDate = arr1[0].trim();
+  checkName(documentShortDate);
   
-  return
+  return;
   
   // Private Functions
   // -----------------
 
-  function checkName(dateToSend) {
+  function checkName(documentShortDate) {
   
-    var emailList = "";
-    var staffToEmail = makestaffMailList();
+    var staffToEmail = makeStaffMailList();
     var rawCommentData = Drive.Comments.list(documentId);
     var commentsContent = getOpenCommentsContent();
     var emailListArray = [];
     
-    for (data in staffToEmail) {
+    // Make a list of all the staff mentioned in text and comments
     
-      var emailAddress = staffToEmail[data];
+    staffToEmail.forEach(function(emailAddress) {
+    
       var staffName = emailAddress[0];
       var staffEmail = emailAddress[1];
       
-      if (staffEmail != "") {
-      
-        var res = findNameInDraft(staffName);
-        
-        //if staffname is in text || staffname is in a comment on the doc
-        if (res || commentsContent.indexOf(('' + staffName).toUpperCase()) > -1) { 
-          emailListArray.push(staffEmail);
-        }
+      if (staffEmail !== "" && (foundNameInText(staffName) || foundNameInComments(staffName))) { 
+        emailListArray.push(staffEmail);
       }      
-    }
+    })
     
-    var commentArryRes = getStaffinFullComment();    
-    var array3 = arrayUnique(emailListArray.concat(commentArryRes));
-    var uniqueArray = (uniq(array3));
-    for (em in uniqueArray) {
-      emailList += uniqueArray[em] + ",";
-    }
+    // Filter the list to one mention of each
     
-    sendDraftMailFinal(emailList, dateToSend);
+    var emailList = "";
+    
+    getUniqueItems(emailListArray).forEach(function(nextEmail) {    
+      emailList += nextEmail +  ",";
+    })
+    
+    // Send each an email
+    
+    sendDraftMailFinal(emailList, documentShortDate);
     
     return;
     
     // Private Functions
     // -----------------
 
-    function sendDraftMailFinal(emailList, dateToSend) {
+    function getUniqueItems(a) {
+      var seen = {};
+      var newArray = a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+      })
+      return newArray;
+    }
+
+
+    function foundNameInComments(staffName) {
+      return commentsContent.indexOf(('' + staffName).toUpperCase()) !== -1
+    }
+
+    function foundNameInText(staffName) {
+    
+      var check = 0;
+      staffName = staffName.trim();
+      
+      if (staffName !== "") {
+      
+        var body = docSunday.getBody();
+        var textToHighlight = staffName;
+        var paras = body.getParagraphs();
+        var textLocation = {};
+        var i;
+        var result = "";
+        
+        for (i = 0; i < paras.length; ++i) {
+        
+          textLocation = paras[i].findText(textToHighlight);
+          
+          if (textLocation != null && textLocation.getStartOffset() != -1) {
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    }
+
+    function sendDraftMailFinal(emailList, documentShortDate) {
     
       if (emailList === '') {
         log('No emails sent')
@@ -356,14 +396,14 @@ function inviteStaffSponsorsToComment_() {
       }
       
       var sundayAnnouncementsDraftDocumentUrl = DocumentApp.openById(documentId).getUrl();
-      var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", dateToSend);
+      var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", documentShortDate);
       var body = Utilities.formatString("Dear Event Sponsor: <br><br> \
     Please review the document linked below regarding promotion for your upcoming event.<br><br>\
     You are invited to suggest changes to your event's promotion by typing directly in the document by Friday EOD. <br><br>\
     Thank you!<br><br>--<br>\
     <a href='%s'>[ %s ] Sunday Announcement draft</a>", 
                                         sundayAnnouncementsDraftDocumentUrl,
-                                        dateToSend
+                                        documentShortDate
                                        );
       emailList = emailList.replace(/\,$/, ''); //should build the list without the trailing comma in the first place
       
@@ -383,6 +423,7 @@ function inviteStaffSponsorsToComment_() {
       function storeScriptRunTime() {
       
         var comments = Drive.Comments.list(documentId);
+        var foundLastRunTime = false
         
         if (comments.items && comments.items.length > 0) {
         
@@ -392,11 +433,23 @@ function inviteStaffSponsorsToComment_() {
             var content = comment.content
             
             if (content.indexOf(config.scriptLastRunText) !== -1) {            
-              var resource = {content: config.scriptLastRunText + new Date()}
-              Drive.Comments.patch(resource, documentId, comment.commentId)
+              var resource = {content: config.scriptLastRunText + new Date()};
+              Drive.Comments.patch(resource, documentId, comment.commentId);
+              foundLastRunTime = true;
+              break;
             }
           }
         }  
+        
+        if (!foundLastRunTime) {
+        
+          // There is no 'script last run time' comment so create one now
+          var resource = {
+            content: config.scriptLastRunText + new Date(),
+          }
+          
+          Drive.Comments.insert(resource, documentId);
+        }
         
       } // sendDraftMailFinal.storeScriptRunTime()
       
@@ -415,12 +468,14 @@ function inviteStaffSponsorsToComment_() {
       
         var nextComment = rawCommentData.items[i]        
         var modifiedDate = new Date(nextComment.modifiedDate)
-        
+                
         if (nextComment.content.indexOf(config.scriptLastRunText) === -1 && 
             nextComment.status === "open" && 
             !nextComment.deleted && 
             modifiedDate > lastTimeScriptRun) {
-            
+        
+          // This is not the "script last run" AND it is open AND it hasn't been 
+          // deleted AND it was created since the script was last run
           commentsContent += "  " + (nextComment.content)
         }
       }
@@ -432,7 +487,7 @@ function inviteStaffSponsorsToComment_() {
       
       function getLastTimeScriptRun() {
       
-        var datetime = new Date(0); // 1970 - not run yet
+        var datetime = null;
         var comments = Drive.Comments.list(documentId);
         
         if (comments.items && comments.items.length > 0) {
@@ -441,61 +496,62 @@ function inviteStaffSponsorsToComment_() {
           
             var content = comments.items[i].content;
             
-            if (content.indexOf(config.scriptLastRunText) !== -1) {           
+            if (content.indexOf(config.scriptLastRunText) !== -1) {
               datetime = new Date(content.slice(config.scriptLastRunTextLength));
+              break;
             }
+          }
+          
+          if (datetime === null) {
+          
+            var numberOfWeeks = getNumberOfWeeksFromUser();
+            var WEEKS_IN_MS = 7 * 24 * 60 * 60 * 1000;
+            datetime = new Date((new Date()).getTime() - (numberOfWeeks * WEEKS_IN_MS));            
           }
         } 
         
-        return datetime
+        log('datetime: ' + datetime);
+        return datetime;
         
-      } // getOpenCommentsContent.getLastTimeScriptRun()
-
-    } // getOpenCommentsContent()
-
-    function getStaffinFullComment() { 
-    
-      var emailList = "";
-      var commentArray = [];
-
-      if (rawCommentData.length > 0) {
-      
-        var newstr = JSON.stringify(rawCommentData);
-        var arr1 = newstr.split('{"content":"');
-        var arr2 = arr1[1].split('","htmlContent');
-        var att = arr2[0].split(",");
+        // Private Functions
+        // -----------------
         
-        var len = att.length;
+        /**
+         * Get the number of weeks from the user to go back and look at comments
+         * for staff names
+         */
+         
+        function getNumberOfWeeksFromUser() {
+
+          var numberOfWeeks = 0;
+
+          if (SpreadsheetApp.getActive() !== null) { 
         
-        if (len == 1) {
-          var att = arr2[0].split(";");
-        }
-                
-        for (n in att) {
-          var nameToSearch = att[n];
-          var sheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID')).getActiveSheet();
-          var dataRange = sheet.getDataRange();
-          var values = dataRange.getValues();
-          for (var i = 2; i < values.length; i++) { //skip header row
-            var name = values[i][0] + " " + values[i][1];
-            nameToSearch = nameToSearch.trim();
-            name = name.trim();
-            if (nameToSearch == name) {
-              commentArray.push(values[i][8]); // Email
-            }
+            var ui = SpreadsheetApp.getUi();
+            var responseNumber;
+            
+            do {
+              numberOfWeeks = parseInt(ui.prompt(config.notRunYetText).getResponseText(), 10);
+            } while (numberOfWeeks !== numberOfWeeks);
+            
+          } else {
+          
+            throw new Error('No active document');
           }
-        }
-      }
-      
-      return commentArray;
-      
-    } // inviteStaffSponsorsToComment_.checkName.getStaffinFullComment()    
+          
+          return numberOfWeeks;
+
+        } // inviteStaffSponsorsToComment_.checkName.getOpenCommentsContent.getLastTimeScriptRun.getNumberOfWeeksFromUser()
+        
+      } // inviteStaffSponsorsToComment_.checkName.getOpenCommentsContent.getLastTimeScriptRun()
+
+    } // inviteStaffSponsorsToComment_.checkName.getOpenCommentsContent()
     
   } // inviteStaffSponsorsToComment_.checkName()
   
 } // inviteStaffSponsorsToComment_()
 
-function makestaffMailList() { //redo this to use getDataRange() then reduce to get needed output
+function makeStaffMailList() { 
   var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
   var numRows = staffSheet.getLastRow();
   var staffRows = staffSheet.getSheetValues(3, 1, numRows, 2);
@@ -507,26 +563,6 @@ function makestaffMailList() { //redo this to use getDataRange() then reduce to 
   }
   return staffFromSheet;
 }
-
-function findNameInDraft(staffName) {
-  var check = 0;
-  staffName = staffName.trim();
-  if (staffName != "") {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var textToHighlight = staffName;
-    var paras = body.getParagraphs();
-    var textLocation = {};
-    var i;
-    var result = "";
-    for (i = 0; i < paras.length; ++i) {
-      textLocation = paras[i].findText(textToHighlight);
-      if (textLocation != null && textLocation.getStartOffset() != -1) return true;
-    }
-  }
-  return false;
-}
-
 
 function reorderParagraphs_() {
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));

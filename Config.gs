@@ -8,6 +8,8 @@ var config = {
   scriptLastRunText: 'Script last run: ',
   scriptLastRunTextLength: 16,
 
+  notRunYetText: 'The script hasn\’t been run before, how many weeks would you like to go back in the comments (to look for staff members to email)',
+
   announcements: { // Legacy
 
     placeholder : '{{CONTENT IN ROTATION}}',

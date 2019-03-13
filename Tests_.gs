@@ -1,3 +1,11 @@
+function test_uniq() {
+  var a = [1,2,1,3,2,4]
+  var b = arrayUnique(a)
+  return
+}
+
+
+
 function test_modifyDatesInBody() {
   modifyDatesInBody_()
   return
@@ -64,10 +72,10 @@ function test_removeComments() {
   
     Logger.log('before - status: ' + nextComment.status + ', deleted: ' + nextComment.deleted + ', content: ' + nextComment.content); 
     
-    if (nextComment.status === 'open') {
+//    if (nextComment.status === 'open') {
       Logger.log('Removing ' + nextComment.content)    
       Drive.Comments.remove(DOC_ID, nextComment.commentId)
-    }    
+//    }    
   } 
   
 } // test_removeComments()
@@ -98,16 +106,15 @@ function test_listComments() {
   if (comments.items && numberOfComments > 0) { 
     for (var i = 0; i < numberOfComments; i++) { 
       var comment = comments.items[i]; 
-     Logger.log(typeof comment.deleted);
-//     Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted); 
-//      var modifiedDateString = comment.modifiedDate
-//      var modifiedDate = new Date(modifiedDateString)
-//      var lastWeek = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000))
-//      if (modifiedDate > lastWeek) {
-//        Logger.log('last week')
-//      } else if (modifiedDate < lastWeek) {
+      Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted); 
+      var modifiedDateString = comment.modifiedDate
+      var modifiedDate = new Date(modifiedDateString)
+      var lastWeek = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000))
+      if (modifiedDate > lastWeek) {
+//       Logger.log('last week')
+      } else if (modifiedDate < lastWeek) {
 //        Logger.log('Longer than a week')
-//      }
+      }
 //      Logger.log('modified: ' + modifiedDateString)
     } 
   } else { 
