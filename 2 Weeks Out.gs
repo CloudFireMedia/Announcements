@@ -290,6 +290,34 @@ function formatGDoc_() {
  * Search the document and comment text for staff to email for comments
  */
 
+/*
+// Two separate “hidden” comments will be used to store the last time
+// rotateContent() ran and inviteComments() ran
+
+WHEN “invite” runs
+  // First get the value to use as last run time
+  IF there is a “last time invite ran” comment
+    Use last time invite ran
+  ELSE 
+    IF there is a “last rotate ran time” comment
+      Use last time rotate ran
+    ELSE
+      Use 1 week ago as last run time
+    END IF
+  END IF
+  // Then process each comment
+  FOR EACH comment
+    IF comment is not deleted AND comment is “open” AND comment has been modified 
+      since last run AND comment is not the “last time invite ran” AND comment is not the “last time rotate ran”
+      Search comment content for staff names 
+    END IF
+  END FOR EACH
+  // Send one email to each staff member mentioned ...
+END WHEN
+
+*/
+
+
 function inviteStaffSponsorsToComment_() {
 
   var docSunday = DocumentApp.getActiveDocument();
@@ -339,8 +367,7 @@ function inviteStaffSponsorsToComment_() {
       emailList += nextEmail +  ",";
     })
     
-    // Send each an email
-    
+    // Send each an email    
     sendDraftMailFinal(emailList, documentShortDate);
     
     return;
@@ -515,6 +542,7 @@ function reorderParagraphs_() {
     doc.getBody().appendParagraph(npa[npi].paragraph);
   }
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
+  
 } // reorderParagraphs_()
 
 function updateWeek2EventDescriptions_() {

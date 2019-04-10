@@ -1,3 +1,20 @@
+function test_misc() {
+  while(true)
+  var a = 1
+}
+
+function test_compareStrings() {
+  var a = 'Title_03_17'
+  var b = 'Title_03_17'
+  var c = compareStrings(a,b)
+  return
+}
+
+function test_Comments_getLastTimeScriptRun() {
+  Comments_.getLastTimeScriptRun('1muy_pMDEuW7ZMbBOY2JR9_g_PXN8P8yV_w6zR0SvSKw')
+  return
+}
+
 function test_uniq() {
   var a = [1,2,1,3,2,4]
   var b = arrayUnique(a)
