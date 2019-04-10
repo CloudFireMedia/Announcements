@@ -38,27 +38,39 @@ function getFirstParagraph(doc) {
   return 'Not Found';
 }
 
-function draft_callFunctions_() {
+function formatGDoc_() {
 
-  draft_removeRowReferences();
-  draft_mergeParagraph();
-  draft_formatParagraph();
-  draft_boldBetweenSquareBrackets();
-  draft_highlightStaffSponsorNames();
+  var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
+  var body = doc.getBody();
+  var paras = body.getParagraphs();
+  var length = paras.length;
+
+//  removeRowReferences();
+//  mergeParagraph();
+//  formatParagraph();
+//  boldBetweenSquareBrackets();
+  highlightStaffSponsorNames();
   
   return;
   
   // Private Functions
   // -----------------
   
-  function draft_removeRowReferences() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
-    var length = paras.length;
+  /**
+   * Remove the row reference from the event title: [ title | row ref | sponsor name ]
+   */
+   
+  // TODO - Although the filtering is done the new title is never written back to the 
+  // GDoc - https://trello.com/c/orpc2fz4/534-removerowreference-doesnt
+   
+  function removeRowReferences() {
+  
     for (i = 0; i < length; ++i) {
+    
       var str = paras[i].getText();
-      if (str.indexOf("of the month") == -1) {
+      
+      if (str.indexOf("of the month") === -1) {
+      
         var arr = str.split("]");
         var str1 = arr[0];
         const regex = /\|.*\|/g;
@@ -68,12 +80,16 @@ function draft_callFunctions_() {
         var found = 0;
         
         if (arr[1] != "" && arr[1] != undefined) {
+        
           found = 1;
           var result = str1 + "]" + arr[1];
+          
         } else {
+        
           if (str1 != undefined) {
+          
             found = 1;
-            if (str.indexOf("]") != -1) {
+            if (str.indexOf("]") !== -1) {
               var result = str1 + "]";
             } else {
               var result = str1;
@@ -92,29 +108,40 @@ function draft_callFunctions_() {
       }
     }
     
-  } // draft_callFunctions_.draft_removeRowReferences()
+  } // formatGDoc_.removeRowReferences()
 
-  function draft_mergeParagraph() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
+  /**
+   * 
+   */
+
+  function mergeParagraph() {
+  
     var textLocation = {};
     var i;
-    var length = paras.length;
     var cnt = 0;
-    //Merge Paragraph
+    
     for (i = 0; i < length; ++i) {
+    
       var paraText = paras[i].getText();
+      
       if (paraText != "") {
+      
         if (cnt != 0) {
+        
           paraText = paraText.trim();
-          if (paraText.indexOf(">>") == 0 || paraText.indexOf(">>") == 1 || paraText.indexOf(">>") == 2 || paraText.indexOf(">>") == 3 || paraText.indexOf(">>") == 4) {
+          
+          if (paraText.indexOf(">>") == 0 || 
+              paraText.indexOf(">>") == 1 || 
+              paraText.indexOf(">>") == 2 || 
+              paraText.indexOf(">>") == 3 ||
+              paraText.indexOf(">>") == 4) {
+          
             var paraTextPrevious = paras[i - 1].getText();
             paraTextPrevious = paraTextPrevious.replace(/[\r\n]/g, "");
             paraText = paraText.replace(/[\r\n]/g, "");
-            //paraTextPrevious=paraTextPrevious.replace("\n","");
             var newParaText = paraTextPrevious + "\n" + paraText;
             paras[i - 1].setText(newParaText);
+            
             if (length - 1 == i) {
               paras[i].setText(".");
             } else {
@@ -124,22 +151,29 @@ function draft_callFunctions_() {
             }
           }
         }
+        
         cnt++;
       }
     }
     
-  } // draft_callFunctions_.draft_mergeParagraph()
+  } // formatGDoc_.mergeParagraph()
   
-  function draft_formatParagraph() {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var paras = body.getParagraphs();
-    //Format Heading
+  /**
+   * Set headings and paragraphs to standard formatting.
+   */
+  
+  function formatParagraph() {
+  
     var cnt = 0;
-    for (i = 0; i < paras.length; ++i) {
+    
+    for (i = 0; i < length; ++i) {
+    
       var paraText = paras[i].getText();
+      
       if (paraText != "") {
+      
         if (cnt == 0) {
+        
           var headingStyle = {};
           headingStyle[DocumentApp.Attribute.BOLD] = false;
           headingStyle[DocumentApp.Attribute.FONT_SIZE] = 9;
@@ -147,8 +181,11 @@ function draft_callFunctions_() {
           headingStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Lato';
           paras[i].setAttributes(headingStyle);
           paras[i].setHeading(DocumentApp.ParagraphHeading.HEADING2);
+          
         } else {
+        
           var bodyStyle = {};
+          
           bodyStyle[DocumentApp.Attribute.BOLD] = false;
           bodyStyle[DocumentApp.Attribute.FONT_SIZE] = 9;
           bodyStyle[DocumentApp.Attribute.FONT_FAMILY] = 'Lato';
@@ -161,52 +198,55 @@ function draft_callFunctions_() {
           paras[i].setAttributes(bodyStyle);
           paras[i].setAlignment(DocumentApp.HorizontalAlignment.LEFT);
         }
+        
         cnt++;
+        
       } else {
+      
         if (cnt > 1) {
           try {
             paras[i].removeFromParent();
-          } catch (e) {}
-          
+          } catch (e) {}          
         }
       }
     }
     
-  } // draft_callFunctions_.draft_formatParagraph()
+  } // formatGDoc_.formatParagraph()
   
-  function draft_boldBetweenSquareBrackets() {
+  function boldBetweenSquareBrackets() {
+  
     var startTag = "[\[]";
     var endTag = "[\]]";
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var para = body.getParagraphs();
     var i = 0;
-    for (i in para) {
-      var from = para[i].findText(startTag);
-      var to = para[i].findText(endTag, from);
+    
+    for (i = 0; i < length; ++i) {
+    
+      var from = paras[i].findText(startTag);
+      var to = paras[i].findText(endTag, from);
+      
       if ((to != null && from != null) && ((to.getStartOffset()) - (from.getStartOffset() + startTag.length) > 0)) {
-        para[i].editAsText().setBold(from.getStartOffset(), to.getStartOffset(), true);
+        paras[i].editAsText().setBold(from.getStartOffset(), to.getStartOffset(), true);
       }
     }
     
-  } // draft_callFunctions_.draft_boldBetweenSquareBrackets()
+  } // formatGDoc_.boldBetweenSquareBrackets()
   
-  function draft_highlightStaffSponsorNames() {
+  function highlightStaffSponsorNames() {
   
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
     var textToHighlight = checkStaffDataSheet();
     var highlightStyle = {};
     highlightStyle[DocumentApp.Attribute.BACKGROUND_COLOR] = '#FCFC00';
     highlightStyle[DocumentApp.Attribute.BOLD] = true;
-    var paras = body.getParagraphs();
     var textLocation = {};
     var i;
     
-    for (i = 0; i < paras.length; ++i) {
+    for (i = 0; i < length; ++i) {
+    
       for (d in textToHighlight) {
+      
         var textToFind = textToHighlight[d];
         textLocation = paras[i].findText(textToFind);
+        
         if (textLocation != null && textLocation.getStartOffset() != -1) {
           textLocation.getElement().setAttributes(textLocation.getStartOffset(), textLocation.getEndOffsetInclusive(), highlightStyle);
         }
@@ -219,6 +259,7 @@ function draft_callFunctions_() {
     // -----------------
     
     function checkStaffDataSheet() {
+    
       var staffArray = [];
       var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
       var lastRow = staffSheet.getLastRow();
@@ -227,176 +268,193 @@ function draft_callFunctions_() {
       var staffFromSheet = "";
       
       var cnt = 0;
+      
       for (var row in staffRows) {
+      
         if (staffRows[row][0] != "") {
           staffFromSheet = staffRows[row][0] + ' ' + staffRows[row][1];
-          staffArray.push(staffFromSheet);
-          
+          staffArray.push(staffFromSheet);      
         }
         cnt++;
       }
+      
       return staffArray;
       
-    } // draft_callFunctions_.draft_highlightStaffSponsorNames.checkStaffDataSheet()
+    } // formatGDoc_.highlightStaffSponsorNames.checkStaffDataSheet()
     
-  } // draft_callFunctions_.draft_highlightStaffSponsorNames()
+  } // formatGDoc_.highlightStaffSponsorNames()
     
-} // draft_callFunctions_()
+} // formatGDoc_()
+
+/**
+ * Search the document and comment text for staff to email for comments
+ */
 
 function inviteStaffSponsorsToComment_() {
 
   var docSunday = DocumentApp.getActiveDocument();
   
   if (docSunday === null) {
-    docSunday = DocumentApp.openById(TEST_GDOC_ID_);
+    docSunday = DocumentApp.openById(config.testDocId);
   }
 
   var documentId = docSunday.getId();
-  var documentName = docSunday.getName();
-  var arrnew = documentName.split("-");
+  var arrnew = docSunday.getName().split("-");
   var paraFirst = arrnew[0];
   var str = arrnew[0];
   var arr = str.split("[");
   var arr1 = arr[1].split("]");
-  var datestr = arr1[0].trim();
-  checkName(datestr);
+  var documentShortDate = arr1[0].trim();
+  checkName(documentShortDate);
   
-  return
+  return;
   
   // Private Functions
   // -----------------
 
-  function checkName(dateToSend) {
+  function checkName(documentShortDate) {
   
-    var emailList = "";
-    var staffToEmail = makestaffMailList();
+    var staffToEmail = makeStaffMailList();
     var rawCommentData = Drive.Comments.list(documentId);
     var commentsContent = getOpenCommentsContent();
     var emailListArray = [];
     
-    for (data in staffToEmail) {
+    // Make a list of all the staff mentioned in text and comments
     
-      var emailAddress = staffToEmail[data];
+    staffToEmail.forEach(function(emailAddress) {
+    
       var staffName = emailAddress[0];
       var staffEmail = emailAddress[1];
       
-      if (staffEmail != "") {
-      
-        var res = findNameInDraft(staffName);
-        
-        //if staffname is in text || staffname is in a comment on the doc
-        if (res || commentsContent.indexOf(('' + staffName).toUpperCase()) > -1) { 
-          emailListArray.push(staffEmail);
-        }
+      if (staffEmail !== "" && (foundNameInText(staffName) || foundNameInComments(staffName))) { 
+        emailListArray.push(staffEmail);
       }      
-    }
+    })
     
-    var commentArryRes = getStaffinFullComment();    
-    var array3 = arrayUnique(emailListArray.concat(commentArryRes));
-    var uniqueArray = (uniq(array3));
-    for (em in uniqueArray) {
-      emailList += uniqueArray[em] + ",";
-    }
+    // Filter the list to one mention of each
     
-    sendDraftMailFinal(emailList, dateToSend);
+    var emailList = "";
+    
+    getUniqueItems(emailListArray).forEach(function(nextEmail) {    
+      emailList += nextEmail +  ",";
+    })
+    
+    // Send each an email
+    
+    sendDraftMailFinal(emailList, documentShortDate);
     
     return;
     
     // Private Functions
     // -----------------
 
+    function getUniqueItems(a) {
+      var seen = {};
+      var newArray = a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+      })
+      return newArray;
+    }
+
+
+    function foundNameInComments(staffName) {
+      return commentsContent.indexOf(('' + staffName).toUpperCase()) !== -1
+    }
+
+    function foundNameInText(staffName) {
+    
+      var check = 0;
+      staffName = staffName.trim();
+      
+      if (staffName !== "") {
+      
+        var body = docSunday.getBody();
+        var textToHighlight = staffName;
+        var paras = body.getParagraphs();
+        var textLocation = {};
+        var i;
+        var result = "";
+        
+        for (i = 0; i < paras.length; ++i) {
+        
+          textLocation = paras[i].findText(textToHighlight);
+          
+          if (textLocation != null && textLocation.getStartOffset() != -1) {
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    }
+
+    function sendDraftMailFinal(emailList, documentShortDate) {
+    
+      if (emailList === '') {
+        log('No emails sent')
+        return;
+      }
+      
+      var sundayAnnouncementsDraftDocumentUrl = DocumentApp.openById(documentId).getUrl();
+      var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", documentShortDate);
+      var body = Utilities.formatString("Dear Event Sponsor: <br><br> \
+    Please review the document linked below regarding promotion for your upcoming event.<br><br>\
+    You are invited to suggest changes to your event's promotion by typing directly in the document by Friday EOD. <br><br>\
+    Thank you!<br><br>--<br>\
+    <a href='%s'>[ %s ] Sunday Announcement draft</a>", 
+                                        sundayAnnouncementsDraftDocumentUrl,
+                                        documentShortDate
+                                       );
+      emailList = emailList.replace(/\,$/, ''); //should build the list without the trailing comma in the first place
+      
+      MailApp.sendEmail({
+        to: emailList,
+        subject: subject,
+        htmlBody: body
+      });
+      
+      Comments_.update(config.lastTimeInviteRunText);
+      
+      log('Emails sent to ' + emailList)
+      
+    } // sendDraftMailFinal()
+
+    /**
+     * Get comments content if it passes the various criteria described, mainly
+     * only since the script was last run
+     */
+
     function getOpenCommentsContent() {
     
       var commentsContent = "";
-      var NUMBER_OF_MS_IN_A_WEEK = 7 * 24 * 60 * 60 * 1000
-      var thisDayLastWeek = new Date(new Date().getTime() - NUMBER_OF_MS_IN_A_WEEK)
+      var lastTimeScriptRun = Comments_.getLastTimeScriptRun(documentId)
 
       for (var i = 0; i < rawCommentData.items.length; i++) {
       
         var nextComment = rawCommentData.items[i]        
         var modifiedDate = new Date(nextComment.modifiedDate)
-        
-        if (nextComment.status === "open" && 
+                
+        if (nextComment.content.indexOf(config.lastTimeInviteRunText) === -1 && 
+            nextComment.content.indexOf(config.lastTimeRotateRunText) === -1 &&
+            nextComment.status === "open" && 
             !nextComment.deleted && 
-            modifiedDate > thisDayLastWeek) {
+            modifiedDate > lastTimeScriptRun) {
+        
+          // This is not the "script last run" AND it is open AND it hasn't been 
+          // deleted AND it was created since the script was last run
           commentsContent += "  " + (nextComment.content)
         }
       }
       
       return ('' + commentsContent).toUpperCase();
-    }
-
-    function getStaffinFullComment() { 
-    
-      var emailList = "";
-      var commentArray = [];
-
-      if (rawCommentData.length > 0) {
       
-        var newstr = JSON.stringify(rawCommentData);
-        var arr1 = newstr.split('{"content":"');
-        var arr2 = arr1[1].split('","htmlContent');
-        var att = arr2[0].split(",");
-        
-        var len = att.length;
-        
-        if (len == 1) {
-          var att = arr2[0].split(";");
-        }
-                
-        for (n in att) {
-          var nameToSearch = att[n];
-          var sheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID')).getActiveSheet();
-          var dataRange = sheet.getDataRange();
-          var values = dataRange.getValues();
-          for (var i = 2; i < values.length; i++) { //skip header row
-            var name = values[i][0] + " " + values[i][1];
-            nameToSearch = nameToSearch.trim();
-            name = name.trim();
-            if (nameToSearch == name) {
-              commentArray.push(values[i][8]); // Email
-            }
-          }
-        }
-      }
-      
-      return commentArray;
-      
-    } // inviteStaffSponsorsToComment_.checkName.getStaffinFullComment()    
+    } // inviteStaffSponsorsToComment_.checkName.getOpenCommentsContent()
     
   } // inviteStaffSponsorsToComment_.checkName()
   
 } // inviteStaffSponsorsToComment_()
 
-function sendDraftMailFinal(emailList, dateToSend) {
-
-  if (emailList === '') {
-    log('No emails sent')
-    return;
-  }
-
-  var sundayAnnouncementsDraftDocumentUrl = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID')).getUrl();
-  var subject = Utilities.formatString("Please Review: [ %s ] Sunday Announcements draft", dateToSend);
-  var body = Utilities.formatString("Dear Event Sponsor: <br><br> \
-Please review the document linked below regarding promotion for your upcoming event.<br><br>\
-You are invited to suggest changes to your event's promotion by typing directly in the document by Friday EOD. <br><br>\
-Thank you!<br><br>--<br>\
-<a href='%s'>[ %s ] Sunday Announcement draft</a>", 
-                                    sundayAnnouncementsDraftDocumentUrl,
-                                    dateToSend
-                                   );
-  emailList = emailList.replace(/\,$/, ''); //should build the list without the trailing comma in the first place
-  
-  MailApp.sendEmail({
-    to: emailList,
-    subject: subject,
-    htmlBody: body
-  });
-  
-  log('Emails sent to ' + emailList)
-}
-
-function makestaffMailList() { //redo this to use getDataRange() then reduce to get needed output
+function makeStaffMailList() { 
   var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
   var numRows = staffSheet.getLastRow();
   var staffRows = staffSheet.getSheetValues(3, 1, numRows, 2);
@@ -408,26 +466,6 @@ function makestaffMailList() { //redo this to use getDataRange() then reduce to 
   }
   return staffFromSheet;
 }
-
-function findNameInDraft(staffName) {
-  var check = 0;
-  staffName = staffName.trim();
-  if (staffName != "") {
-    var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
-    var body = doc.getBody();
-    var textToHighlight = staffName;
-    var paras = body.getParagraphs();
-    var textLocation = {};
-    var i;
-    var result = "";
-    for (i = 0; i < paras.length; ++i) {
-      textLocation = paras[i].findText(textToHighlight);
-      if (textLocation != null && textLocation.getStartOffset() != -1) return true;
-    }
-  }
-  return false;
-}
-
 
 function reorderParagraphs_() {
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
@@ -446,25 +484,22 @@ function reorderParagraphs_() {
     if (ptt.match(mdr)) {
       md = mdr.exec(ptt);
       npa[npi].md = parseFloat(md[2]);
-      //npa[npi].paragraph.replaceText(mdr2,md[1]);
-      //ptt=npa[npi].paragraph.getText();
       npa[npi].text = ptt;
       npa[npi].sort = true;
-      //npa[npi].md='';//parseFloat(md[0].replace(/^\[[^\]\|]+\|[^\]]+\][^01-9]+([01-9]+\.[01-9]+)[^01-9]/gi,'$1'));
     }
     npi++;
   }
-  var sdfa = '112';
   var tp = '';
   for (npi = 0; npi < npa.length; npi++) {
     if (npa[npi].sort == true) {
       var tpi = npi;
-      for (var npi2 = npi + 1; npi2 < npa.length; npi2++)
+      for (var npi2 = npi + 1; npi2 < npa.length; npi2++) {
         if (npa[npi2].sort == true) {
           if (npa[npi2].md < npa[tpi].md) {
             tpi = npi2;
           }
         }
+      }
       if (tpi != npi) {
         tp = npa[npi];
         npa[npi] = npa[tpi];
@@ -473,37 +508,24 @@ function reorderParagraphs_() {
     }
   }
   doc.getBody().appendParagraph("");
-  var asdf = '';
   for (var pi = 0; pi < pa.length; pi++) {
-    //pa[pi].removeFromParent();//doc.getBody().removeChild(pa[pi]);
     doc.getBody().removeChild(pa[pi]);
   }
-  var asdff = '';
   for (npi = 0; npi < npa.length; npi++) {
     doc.getBody().appendParagraph(npa[npi].paragraph);
   }
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
-  var asdffff = '';
-}
+} // reorderParagraphs_()
 
-
-
-/* Redevelopment note: it would be great if this script would also reference 
-'This Sunday's Announcements' as well as 'Next Sunday's Announcements' as the
-source doc. If two matches are found, the more recently edited version should be used 
-(i.e.the version on 'Next Sunday's Announcements'). Even better would be if this script
-could ALSO reference all pages dated 8 weeks prior to this Sunday on the Master Doc 
-for the same reason, with the same rule about more recently edited content taking priority.
-*/
-//This function will use Regex to match events
-function matchEvents_() {
+function updateWeek2EventDescriptions_() {
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
   
   var draftdoc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
+  
   //will return Paragraph array
-  var pa = draftdoc.getBody().getParagraphs(); //contains event and style content
+  var draftDocParagraphArray = draftdoc.getBody().getParagraphs(); //contains event and style content
   var npa = [];
   var npi = 0;
   var md = '';
@@ -511,14 +533,17 @@ function matchEvents_() {
   //var mdr2=/^\[[^\]\|]+\|[^\]]+\][^01-9]+([01-9]+\.[01-9]+)[^01-9].*[a-z]+/gi ;
   
   //Build regex object
-  var mdr = /^\[([^\]\|]+\|[^\]]+)\]/gi;
-  var mdr2 = /^\[[^\]\|]+\|[^\]]+\].*[a-z]+/gi;
+  var mdr = /^\[([^\]\|]+\|[^\]]+)\]/gi; // [ ... | ... ]
+  var mdr2 = /^\[[^\]\|]+\|[^\]]+\].*[a-z]+/gi; // [ ... | ... ] ...
   var mdrblank = /[a-z]+/gi;
   
   //DRAFT DOC:  iterate through the paragraph array
+  
   draftdoc.getBody().appendParagraph(" ");
-  for (var pi = 0; pi < pa.length; pi++) {
-    var pt = pa[pi];
+  
+  for (var pi = 0; pi < draftDocParagraphArray.length; pi++) {
+  
+    var pt = draftDocParagraphArray[pi];
     var ptt = pt.getText(); //get paragraph text as String
     npa[npi] = {};
     npa[npi].paragraph = pt;
@@ -534,6 +559,7 @@ function matchEvents_() {
       
       //work on EVENTS document
       for (var opi = 0; opi < opa.length; opi++) {
+      
         //if event matches
         if (opa[opi].getText().indexOf(npa[npi].event) >= 0) {
         
@@ -547,6 +573,7 @@ function matchEvents_() {
           //in the reference paragraph , get only text succeeding the first semi colon (;)
           // txt = txt.substring(txt.indexOf(';') + 1, txt.length);
           txt = txt.replace(npa[npi].event, '');
+          
           //get current 
           //--------------------------------
           var body = draftdoc.getBody();
@@ -578,21 +605,26 @@ function matchEvents_() {
     npi++;
   }
   
-} // matchEvents_()
+} // updateWeek2EventDescriptions_()
 
 function removeShortStartDates_() {
 
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
   var paras = doc.getBody().getParagraphs();
-  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;//matches: "[ foo | bar ] 05.29 ; " or "[ foo | bar ] << baz 05.29 >>; " capturing the portion after [ ]
+  
+  //matches: "[ foo | bar ] 05.29 ; " or "[ foo | bar ] << baz 05.29 >>; " capturing the portion after [ ]
+  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;
   
   for (var p in paras) {
   
     var text = paras[p].getText();
-    var match = new RegExp(re).exec(text);//MUST use a new regexp each check or the next check picks up after the previous (making no match size it skips the one at 0)
     
-    if(match)
+    //MUST use a new regexp each check or the next check picks up after the previous (making no match size it skips the one at 0)
+    var match = new RegExp(re).exec(text);
+    
+    if (match) {
       paras[p].replaceText(match[1].replace('\[','\\[').replace('\|','\\|').replace('\]','\\]'), ' ');
+    }
   }
 }
 
