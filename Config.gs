@@ -1,9 +1,17 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v0.3.1"
+var SCRIPT_VERSION = "v1.0"
 
-var TEST_GDOC_ID_ = '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58';
+var ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
 var config = {
+  
+  testDocId: '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58',
+
+  lastTimeInviteRunText: 'Last time comments requested: ',
+  lastTimeInviteRunTextLength: 30,
+
+  lastTimeRotateRunText: 'Last time content rotated: ',
+  lastTimeRotateRunTextLength: 27,
 
   announcements: { // Legacy
 

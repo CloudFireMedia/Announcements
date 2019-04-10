@@ -1,3 +1,34 @@
+function test_uniq() {
+  var a = [1,2,1,3,2,4]
+  var b = arrayUnique(a)
+  return
+}
+
+function test_modifyDatesInBody() {
+  modifyDatesInBody_()
+  return
+}
+
+function test_formatGDoc() {
+  formatGDoc_()
+  return
+}
+
+function test_short() {
+  var text = '[ title | FN1 LN1 ] 01.01;'
+  var re = /^\[[^\]\|]+\|[^\]]+\](\D+\d{1,2}\.\d{1,2}\W+)/gi;
+  var match = new RegExp(re).exec(text);
+  return
+}
+
+function test_reorderParagraphs() {
+  reorderParagraphs_()
+}
+
+function test_copySlides() {
+  copySlides_()
+}
+
 function test_inviteStaffSponsorsToComment() {
   inviteStaffSponsorsToComment_()
 }
@@ -18,33 +49,26 @@ function test_getChildren() {
   }
 }
 
-function test_removeComments() {
+// Comments
+// --------
 
+function test_createComment() {
+  createComment('Test1')
+  test_listComments()
+}
+
+function test_removeComments() {
   var DOC_ID = '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58'
 //  var DOC_ID = '1L8myiog-o6puURPuWu7R6UOntPRp4-_xfHcdUTo3Yzc'
-//  var COMMENT_ID = 'AAAACjkftLo'
-  
-//  var nextComment = Drive.Comments.get(DOC_ID, COMMENT_ID); 
-//  nextComment = Drive.Comments.remove(DOC_ID, COMMENT_ID); 
-  
-//  Logger.log('before - status: ' + nextComment.status + ', deleted: ' + nextComment.deleted + ', content: ' + nextComment.content); 
-
-// return
-
   var comments = Drive.Comments.list(DOC_ID); 
-
-  for (var i = 0; i < comments.items.length; i++) { 
-  
-    var nextComment = comments.items[i]
-  
+  for (var i = 0; i < comments.items.length; i++) {   
+    var nextComment = comments.items[i]  
     Logger.log('before - status: ' + nextComment.status + ', deleted: ' + nextComment.deleted + ', content: ' + nextComment.content); 
-    
-    if (nextComment.status === 'open') {
-      Logger.log('Removing ' + nextComment.content)    
-      Drive.Comments.remove(DOC_ID, nextComment.commentId)
-    }    
+    Logger.log('Removing ' + nextComment.content)    
+    Drive.Comments.remove(DOC_ID, nextComment.commentId)
   } 
   
+  test_listComments()
 } // test_removeComments()
 
 function test_updateComment() {
@@ -73,16 +97,15 @@ function test_listComments() {
   if (comments.items && numberOfComments > 0) { 
     for (var i = 0; i < numberOfComments; i++) { 
       var comment = comments.items[i]; 
-     Logger.log(typeof comment.deleted);
-//     Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted); 
-//      var modifiedDateString = comment.modifiedDate
-//      var modifiedDate = new Date(modifiedDateString)
-//      var lastWeek = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000))
-//      if (modifiedDate > lastWeek) {
-//        Logger.log('last week')
-//      } else if (modifiedDate < lastWeek) {
+      var modifiedDateString = comment.modifiedDate
+      var modifiedDate = new Date(modifiedDateString)      
+      Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted + ', modified: ' + modifiedDateString); 
+      var lastWeek = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000))
+      if (modifiedDate > lastWeek) {
+//       Logger.log('last week')
+      } else if (modifiedDate < lastWeek) {
 //        Logger.log('Longer than a week')
-//      }
+      }
 //      Logger.log('modified: ' + modifiedDateString)
     } 
   } else { 

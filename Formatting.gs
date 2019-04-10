@@ -13,6 +13,7 @@ function format_master_(doc) {
   }
 
   var body = doc.getBody();
+  log(body.getText())
   var paragraphs = body.getParagraphs();
   
   format_doubleSpaceToSingle(doc);
