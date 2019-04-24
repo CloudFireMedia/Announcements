@@ -1,3 +1,13 @@
+// v1.1
+// ----
+//
+// - Various fixes, see test spec for errors
+
+// v1.0
+// ----
+//
+// - First add-on release
+
 // v0.3
 // ----
 //

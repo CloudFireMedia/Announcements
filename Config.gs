@@ -1,5 +1,5 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v1.0"
+var SCRIPT_VERSION = "v1.1"
 
 var ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -16,13 +16,6 @@ var config = {
   announcements: { // Legacy
 
     placeholder : '{{CONTENT IN ROTATION}}',
-    
-    // ==========================================================================================================
-    //Feel free to change these to fit your needs. ==============================================================
-    
-    //notificationEmail - who to tell when someone needs to be told (mostly for error reporting in this script)
-    //this can have multiple email addresses like so: ['bob@rupholdt.com','siervo@gmail.com']
-    notificationEmail : [],
     
     //format - this consists of several format definitions used to format the document's appearance
     format : {

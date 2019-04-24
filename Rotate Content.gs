@@ -307,17 +307,25 @@ Do you want to continue?\
 //events written in 'This Sunday's Announcements' doc to the destination folder
 
 function copySlides_() {
-  log('Start: copySlides_()')
+  log('Start: copySlides_()');
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   var text = doc.getBody().editAsText().getText();
   var announcementStartRegEx = /\[[^\|\]]+\|/g;
   var fileTitleArray = [];
+  var fileTitleMatch;
   
   //removes the first and last characters, ie: the [ and | from the above (but oddly leaves the spaces)
-  while (fileTitleMatch = announcementStartRegEx.exec(text))
-  
-  //removes [, | and any spaces
-  fileTitleArray.push(fileTitleMatch[0].replace(/(^. *| *.$)/g, '') );
+
+  do {
+
+    fileTitleMatch = announcementStartRegEx.exec(text);
+    
+    if (fileTitleMatch !== null) {
+      //removes [, | and any spaces
+      fileTitleArray.push(fileTitleMatch[0].replace(/(^. *| *.$)/g, ''));
+    }
+    
+  } while (fileTitleMatch !== null) 
   
   var folderSource = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_SOURCE_ID'));
   var folderDestination = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_DESTINATION_ID'));
@@ -330,11 +338,15 @@ function copySlides_() {
   if( ! filesDestination) throw new Error('Unable to access slide destination folder')
   try{
     while (filesDestination.hasNext()) {
-      filesDestination.next().setTrashed(true);
+      var nextFile = filesDestination.next()
+//      nextFile.setTrashed(true);
+//      log('Deleted "' + nextFile.getName() + '" in "' + folderDestination.getId() + '"')
     }
   }catch(e){
     throw new Error('Unable to delete old files from slide destination folder')
   }
+  
+  log('fileTitleArray: ' + JSON.stringify(fileTitleArray))
   
   //copy this weeks files to folder
   var filesSource = folderSource.getFiles();
@@ -345,8 +357,12 @@ function copySlides_() {
       if (filename.match(/\.jpg|\.png/)){//only copy image files
         for (var f in fileTitleArray) {
           var filenameSansExt = filename.replace(/\.[^.]+$/i, '');//remove extension
-          if (compareStrings(filenameSansExt, fileTitleArray[f]) > 0.75) {//check file name against announcement title
+          log('filenameSansExt: ' + filenameSansExt)
+          var compareResult = compareStrings(filenameSansExt, fileTitleArray[f]);
+          log('compareResult: ' + compareResult);
+          if (compareResult > 0.75) {//check file name against announcement title
             file.makeCopy(folderDestination);
+            log('Created copy of "' + filename + '" in "' + folderDestination.getId() + '"')
           }
         }
       }

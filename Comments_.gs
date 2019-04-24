@@ -28,7 +28,8 @@ var Comments_ = (function(ns) {
     var foundComment = false
     
     if (comments.items && comments.items.length > 0) {
-      foundComment = comments.items.some(function(comment) {      
+    
+      foundComment = comments.items.some(function(comment) {   
         var content = comment.content
         if (content.indexOf(text) !== -1) { 
           var resource = {content: text + new Date()};
@@ -64,37 +65,38 @@ var Comments_ = (function(ns) {
     
     if (comments.items && comments.items.length > 0) {
       
-      comments.items.some(function(comment) {
-              
-        var content = comment.content;
+      comments.items.some(function(comment) {    
+      
+        if (comment.status !== "open" || comment.deleted) {
+          return false;
+        }
+      
+        var content = comment.content;      
         
-        if (content.indexOf(config.lastTimeInviteRunText) !== -1) {
+        if (content.indexOf(config.lastTimeInviteRunText) === 0) { 
         
           lastTimeInvitesSent = new Date(content.slice(config.lastTimeInviteRunTextLength));
+          return true;
           
-        } else if (content.indexOf(config.lastTimeContentRotated) !== -1) {
+        } else if (content.indexOf(config.lastTimeRotateRunText) === 0) {
         
           lastTimeContentRotated = new Date(content.slice(config.lastTimeRotateRunTextLength));
+          return true;
         }        
       })
     }  
     
     // Determine the date/time to return
 
-    if (lastTimeInvitesSent !== null) {    
-    
+    if (lastTimeInvitesSent !== null) {        
       datetime = lastTimeInvitesSent;
-      
     } else if (lastTimeContentRotated !== null) {
-    
       datetime = lastTimeContentRotated;
-      
     } else {
-    
       datetime = new Date((new Date()).getTime() - ONE_WEEK_IN_MS); 
     }
 
-    log('datetime: ' + datetime);
+    log('getLastTimeScriptRun datetime: ' + datetime);
     return datetime;
     
   } // Comments_.getLastTimeScriptRun()
