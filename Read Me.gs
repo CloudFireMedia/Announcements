@@ -1,3 +1,24 @@
+// v1.2.1
+// ------
+//
+// - Re-enable delete of files in CopySlides_()
+
+// v1.2
+// ----
+//
+// - Make sure comment updated even if no emails sent
+// - Moved TEST_ID into Tests_.gs
+
+// v1.1
+// ----
+//
+// - Various fixes, see test spec for errors
+
+// v1.0
+// ----
+//
+// - First add-on release
+
 // v0.3
 // ----
 //

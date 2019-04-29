@@ -11,7 +11,7 @@ function getUpcomingSunday(date, skipTodayIfSunday) {
 }
 
 function log(message) {
-  Logger.log(message)
+  SpreadsheetApp.openById(Config.get('ANNOUNCEMENTS_LOG')).getSheetByName('Log').appendRow([new Date(), message])
 }
 
 //returns the date formatted with format, default to today if date not provided
@@ -68,36 +68,53 @@ function getLastSundayOfMonth(date){
   return date;
 }
 
+// https://stackoverflow.com/questions/10473745/compare-strings-javascript-return-of-likely
+
 function compareStrings(s1, s2) {
-  var sa1 = s1.split(' ');
-  var sa2 = s2.split(' ');
-  var s1cnt = 0;
-  var s1l = sa1.length;
-  var s1i = 0;
-  var sa1tmp = [];
-  for (s1i = 0; s1i < s1l; s1i++) {
-    if (sa1[s1i].match(/.*[a-z]{2}.*/i)) {
-      sa1tmp[s1cnt] = sa1[s1i].replace(/[^a-z]+/i, '');
-      s1cnt++;
-    }
+
+  var longer = s1;
+  var shorter = s2;
+  if (s1.length < s2.length) {
+    longer = s2;
+    shorter = s1;
   }
-  sa1 = sa1tmp;
-  var s2cnt = 0;
-  var s2cntm = 0;
-  var s2i = 0;
-  var s2l = sa2.length;
-  for (s2i = 0; s2i < s2l; s2i++) {
-    if (sa2[s2i].match(/.*[a-z]{2}.*/i)) {
-      sa2[s2i] = sa2[s2i].replace(/[^a-z]/i, '');
-      s2cnt++;
-      for (s1i = 0; s1i < s1cnt; s1i++) {
-        if (sa2[s2i] == sa1[s1i]) s2cntm++;
+  var longerLength = longer.length;
+  if (longerLength == 0) {
+    return 1.0;
+  }
+  return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+  
+  // Private Functions
+  // -----------------
+  
+  function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+  
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+      var lastValue = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i == 0)
+          costs[j] = j;
+        else {
+          if (j > 0) {
+            var newValue = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue),
+                costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
       }
+      if (i > 0)
+        costs[s2.length] = lastValue;
     }
-  }
-  if (s1cnt < s2cnt) return s2cntm / s1cnt;
-  return s2cntm / s2cnt;
-}
+    return costs[s2.length];
+  }  
+  
+} // compareStrings()
 
 function getSundayOfMonthOrdinal(date) {
   var dayOfMonth = date.getDate();

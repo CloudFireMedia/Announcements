@@ -290,12 +290,40 @@ function formatGDoc_() {
  * Search the document and comment text for staff to email for comments
  */
 
+/*
+// Two separate “hidden” comments will be used to store the last time
+// rotateContent() ran and inviteComments() ran
+
+WHEN “invite” runs
+  // First get the value to use as last run time
+  IF there is a “last time invite ran” comment
+    Use last time invite ran
+  ELSE 
+    IF there is a “last rotate ran time” comment
+      Use last time rotate ran
+    ELSE
+      Use 1 week ago as last run time
+    END IF
+  END IF
+  // Then process each comment
+  FOR EACH comment
+    IF comment is not deleted AND comment is “open” AND comment has been modified 
+      since last run AND comment is not the “last time invite ran” AND comment is not the “last time rotate ran”
+      Search comment content for staff names 
+    END IF
+  END FOR EACH
+  // Send one email to each staff member mentioned ...
+END WHEN
+
+*/
+
+
 function inviteStaffSponsorsToComment_() {
 
   var docSunday = DocumentApp.getActiveDocument();
   
   if (docSunday === null) {
-    docSunday = DocumentApp.openById(config.testDocId);
+    docSunday = DocumentApp.openById(TEST_DOC_ID_);
   }
 
   var documentId = docSunday.getId();
@@ -339,9 +367,10 @@ function inviteStaffSponsorsToComment_() {
       emailList += nextEmail +  ",";
     })
     
-    // Send each an email
-    
+    // Send each an email    
     sendDraftMailFinal(emailList, documentShortDate);
+    
+    Comments_.update(config.lastTimeInviteRunText);
     
     return;
     
@@ -389,7 +418,7 @@ function inviteStaffSponsorsToComment_() {
     }
 
     function sendDraftMailFinal(emailList, documentShortDate) {
-    
+              
       if (emailList === '') {
         log('No emails sent')
         return;
@@ -412,9 +441,7 @@ function inviteStaffSponsorsToComment_() {
         subject: subject,
         htmlBody: body
       });
-      
-      Comments_.update(config.lastTimeInviteRunText);
-      
+            
       log('Emails sent to ' + emailList)
       
     } // sendDraftMailFinal()
@@ -456,7 +483,7 @@ function inviteStaffSponsorsToComment_() {
 
 function makeStaffMailList() { 
   var staffSheet = SpreadsheetApp.openById(Config.get('STAFF_DATA_GSHEET_ID'));
-  var numRows = staffSheet.getLastRow();
+  var numRows = staffSheet.getLastRow() - 2;
   var staffRows = staffSheet.getSheetValues(3, 1, numRows, 2);
   var staffEmails = staffSheet.getSheetValues(3, 9, numRows, 1);
   var staffFromSheet = [];
@@ -515,6 +542,7 @@ function reorderParagraphs_() {
     doc.getBody().appendParagraph(npa[npi].paragraph);
   }
   doc.getBody().removeChild(doc.getBody().getParagraphs()[0]);
+  
 } // reorderParagraphs_()
 
 function updateWeek2EventDescriptions_() {
@@ -972,8 +1000,7 @@ function countInstancesofLiveAnnouncement_() {
             }
           }
           
-          var matches1 = parString.match(regE);
-          
+          var matches1 = parString.match(regE);          
           var match1;
           
           if (match1 = regE.exec(parString)) {

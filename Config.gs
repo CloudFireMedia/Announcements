@@ -1,12 +1,10 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v1.0"
+var SCRIPT_VERSION = "v1.2.1"
 
 var ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
 var config = {
   
-  testDocId: '11WLqbxCb_NCNAA9sSxn-SD5sM6Mae0yUYe0w-rj-e58',
-
   lastTimeInviteRunText: 'Last time comments requested: ',
   lastTimeInviteRunTextLength: 30,
 
@@ -16,13 +14,6 @@ var config = {
   announcements: { // Legacy
 
     placeholder : '{{CONTENT IN ROTATION}}',
-    
-    // ==========================================================================================================
-    //Feel free to change these to fit your needs. ==============================================================
-    
-    //notificationEmail - who to tell when someone needs to be told (mostly for error reporting in this script)
-    //this can have multiple email addresses like so: ['bob@rupholdt.com','siervo@gmail.com']
-    notificationEmail : [],
     
     //format - this consists of several format definitions used to format the document's appearance
     format : {
