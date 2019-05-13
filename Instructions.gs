@@ -45,28 +45,16 @@ by their respective forms.<br>\
 <dd>Same as Add Week but adds weeks up to the end of current month.<br>\
 If the first added week is a new month, adds the entire new month.<br><br></dd>\
 \
-<dt>Archive</dt>\
-<dd>Moves old pages to the document specified during setup<br><br></dd>\
-\
-<dt>Archive Setup</dt>\
-<dd>Required to use the Archive function.\
-The user is prompted for the ID or URL of the document to save archives to.<br>\
-On document open, if the archive setup has not been run, the user is prompted to do so.<br>\
-Once so notified, that user will not be prompted again for another two hours.<br>\
-(And then, only if they reopen the document.)<br><br></dd>\
-\
 <dt>Format Document</dt>\
-<dd>Corrects document formatting by:<br>\
-Removing double spaces<br>\
-Removing empty paragraphs<br>\
-Correcting page breaks where missing or doubled<br>\
-Settings page title headings and subheadings<br>\
-Standardizing font attributes<br>\
-Adjusting color for future and past pages<br>\
+<dd>Corrects document formatting by:<br><ul>\
+<li>Removing double spaces<br>\
+<li>Removing empty paragraphs<br>\
+<li>Correcting page breaks where missing or doubled<br>\
+<li>Settings page title headings and subheadings<br>\
+<li>Standardizing font attributes<br>\
+<li>Adjusting color for future and past pages<br>\
 </ul>\
 <br/>\
-<dt>Automation</dt>\
-<dd>Enables the automatic insertion and archiving of pages each week.<br><br></dd>\
 ";
   
   showInstructions(html, title);
