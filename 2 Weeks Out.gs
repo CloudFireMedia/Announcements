@@ -45,10 +45,10 @@ function formatGDoc_() {
   var paras = body.getParagraphs();
   var length = paras.length;
 
-//  removeRowReferences();
-//  mergeParagraph();
-//  formatParagraph();
-//  boldBetweenSquareBrackets();
+  removeRowReferences();
+  mergeParagraph();
+  formatParagraph();
+  boldBetweenSquareBrackets();
   highlightStaffSponsorNames();
   
   return;
@@ -111,7 +111,9 @@ function formatGDoc_() {
   } // formatGDoc_.removeRowReferences()
 
   /**
-   * 
+   * Tidy up the CRs and spaces around text after ">>" in the event description. If the >> at the 
+   * end of the event description is within 5 characters of the left hand margin, remove any 
+   * CRs between it and the previous event text, along with any spaces to the left of it. 
    */
 
   function mergeParagraph() {
