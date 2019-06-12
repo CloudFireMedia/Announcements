@@ -336,6 +336,7 @@ function inviteStaffSponsorsToComment_() {
   var arr1 = arr[1].split("]");
   var documentShortDate = arr1[0].trim();
   checkName(documentShortDate);
+  cleanInstancesofLiveAnnouncement_();
   
   return;
   
