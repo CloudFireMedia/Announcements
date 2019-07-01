@@ -30,7 +30,6 @@ Do you want to continue?\
   moveOldestToArchive(); // Master -> Archive (oldest)
   
   Comments_.update(config.lastTimeRotateRunText);
-  countInstancesofLiveAnnouncement_();
 
   return;
   

@@ -1,3 +1,20 @@
+/**
+ * A high level function that does various processing of the 2 week GDoc
+ */
+
+function process2WeekDoc_() {
+  rotateContent_();
+  copySlides_();
+  formatGDoc_();
+  reorderParagraphs_();
+  removeShortStartDates_();
+  updateWeek2EventDescriptions_();
+  formatGDoc_();
+  modifyDatesInBody_();
+  countInstancesofLiveAnnouncement_();
+  formatGDoc_();
+}
+
 function applyFormattingBody(id) {
   var style = {};
   style[DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] =
