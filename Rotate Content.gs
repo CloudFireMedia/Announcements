@@ -28,7 +28,7 @@ Do you want to continue?\
   moveDraftToNext();     // Draft (week 2) -> Next (week 1)
   moveMasterToDraft();   // Master -> Draft (check out)
   moveOldestToArchive(); // Master -> Archive (oldest)
-  
+
   Comments_.update(config.lastTimeRotateRunText);
 
   return;
