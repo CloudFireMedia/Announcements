@@ -1,12 +1,12 @@
 function getUpcomingSunday(date, skipTodayIfSunday) {
   //return the next Sunday, which might be today
   //skipTodayIfSunday skips this Sunday and returns next week Sunday
-  log( '--getUpcomingSunday('+(date ? fDate(date) : 'null')+')' )
+//  log( '--getUpcomingSunday('+(date ? fDate(date) : 'null')+')' )
   date = new Date(date || new Date());//clone the date so as not to change the original
   date.setHours(0,0,0,0);
   if( skipTodayIfSunday || date.getDay() >0)//if it's not a Sunday...
     date.setDate(date.getDate() -date.getDay() +7);//subtract days to get to Sunday then add a week
-  log('upcomingSunday returned: '+fDate(date));
+//  log('upcomingSunday returned: '+fDate(date));
   return date;
 }
 
@@ -163,7 +163,7 @@ function escapeGasRegExString(re, escapeCharsArrOpt, ignoreCharsArrOpt){
   .replace(/^\//,'')//remove opening /
   .replace(/\/[imgus]*$/,'');//remove closing / and any flags
 
-  log(charsToReplace)
+//  log(charsToReplace)
   for(var c in charsToReplace){
     str = str.replace(charsToReplace[c], '\\$&')
   }
@@ -284,4 +284,8 @@ function extractSundayTitle(doc){
   return search
   ? search.getElement().asText().getText()
   : null;
+}
+
+function getUi_() {
+  return (DocumentApp.getActiveDocument() !== null) ? DocumentApp.getUi() : null
 }

@@ -3,6 +3,7 @@
  */
 
 function process2WeekDoc_() {
+  log('process2WeekDoc_()')
   rotateContent_();
   copySlides_();
   formatGDoc_();
@@ -68,6 +69,7 @@ function formatGDoc_() {
   boldBetweenSquareBrackets();
   highlightStaffSponsorNames();
   
+  log('Formatted doc')
   return;
   
   // Private Functions
@@ -309,35 +311,9 @@ function formatGDoc_() {
  * Search the document and comment text for staff to email for comments
  */
 
-/*
-// Two separate “hidden” comments will be used to store the last time
-// rotateContent() ran and inviteComments() ran
-
-WHEN “invite” runs
-  // First get the value to use as last run time
-  IF there is a “last time invite ran” comment
-    Use last time invite ran
-  ELSE 
-    IF there is a “last rotate ran time” comment
-      Use last time rotate ran
-    ELSE
-      Use 1 week ago as last run time
-    END IF
-  END IF
-  // Then process each comment
-  FOR EACH comment
-    IF comment is not deleted AND comment is “open” AND comment has been modified 
-      since last run AND comment is not the “last time invite ran” AND comment is not the “last time rotate ran”
-      Search comment content for staff names 
-    END IF
-  END FOR EACH
-  // Send one email to each staff member mentioned ...
-END WHEN
-
-*/
-
-
 function inviteStaffSponsorsToComment_() {
+
+  log('inviteStaffSponsorsToComment_()')
 
   var docSunday = DocumentApp.getActiveDocument();
   
@@ -388,10 +364,7 @@ function inviteStaffSponsorsToComment_() {
     })
     
     // Send each an email    
-    sendDraftMailFinal(emailList, documentShortDate);
-    
-    Comments_.update(config.lastTimeInviteRunText);
-    
+    sendDraftMailFinal(emailList, documentShortDate);    
     return;
     
     // Private Functions
@@ -475,11 +448,18 @@ function inviteStaffSponsorsToComment_() {
     
       var commentsContent = "";
       var lastTimeScriptRun = Comments_.getLastTimeScriptRun(documentId)
+      
+      if (lastTimeScriptRun === null) {
+        return ''
+      }
 
       for (var i = 0; i < rawCommentData.items.length; i++) {
       
         var nextComment = rawCommentData.items[i]        
         var modifiedDate = new Date(nextComment.modifiedDate)
+                
+        // Since v1.8 "invite request" is no longer stored, but the check to ignore it is kept here 
+        // for backward compatibility
                 
         if (nextComment.content.indexOf(config.lastTimeInviteRunText) === -1 && 
             nextComment.content.indexOf(config.lastTimeRotateRunText) === -1 &&
@@ -515,6 +495,7 @@ function makeStaffMailList() {
 }
 
 function reorderParagraphs_() {
+  log('reorderParagraphs_()')
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
   var pa = doc.getBody().getParagraphs();
   var npa = [];
@@ -566,6 +547,8 @@ function reorderParagraphs_() {
 } // reorderParagraphs_()
 
 function updateWeek2EventDescriptions_() {
+
+  log('updateWeek2EventDescriptions_()')
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
   var opa = doc.getBody().getParagraphs(); //opa contains event text
@@ -657,6 +640,8 @@ function updateWeek2EventDescriptions_() {
 
 function removeShortStartDates_() {
 
+  log('removeShortStartDates_()')
+
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID'));
   var paras = doc.getBody().getParagraphs();
   
@@ -677,7 +662,8 @@ function removeShortStartDates_() {
 }
 
 function modifyDatesInBody_() {
-
+  
+  log('modifyDatesInBody_()')
   updateDatePrototype();
   
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_1WEEK_SUNDAY_ID'));
@@ -817,6 +803,7 @@ function modifyDatesInBody_() {
 
 function cleanInstancesofLiveAnnouncement_() {
 
+  log('cleanInstancesofLiveAnnouncement_()')
   var twoWeeksId = Config.get('ANNOUNCEMENTS_2WEEKS_SUNDAY_ID')
   var doc = DocumentApp.openById(twoWeeksId);
   var docID = doc.getId();
@@ -827,7 +814,8 @@ function cleanInstancesofLiveAnnouncement_() {
 
 function countInstancesofLiveAnnouncement_() {
 
-  cleanInstancesofLiveAnnouncement_()
+  log('countInstancesofLiveAnnouncement_()');
+  cleanInstancesofLiveAnnouncement_();
   
   var regE = new RegExp('\\[\\s([^\\|]*)\\s\\|\\s([^\\]]*)\\s\\]', 'ig');
   

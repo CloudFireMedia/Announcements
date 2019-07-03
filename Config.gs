@@ -1,8 +1,6 @@
 var SCRIPT_NAME = "Announcements"
 var SCRIPT_VERSION = "v1.4.dev_ajr"
 
-var ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
-
 var config = {
   
   lastTimeInviteRunText: 'Last time comments requested: ',
