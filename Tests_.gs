@@ -1,4 +1,4 @@
-var TEST_DOC_ID_ = '1muy_pMDEuW7ZMbBOY2JR9_g_PXN8P8yV_w6zR0SvSKw' // [ 03.31 ] Sunday Announcements - Draft Document
+var TEST_DOC_ID_ = '1m2QHvYcC-a9ywnHu7KHHBG7u5ksF2da9uQQwHXP6MaI' // [ 07.21 ] Sunday Announcements - Draft Document
 
 function test_misc() {
   while(true)
@@ -13,7 +13,7 @@ function test_compareStrings() {
 }
 
 function test_Comments_getLastTimeScriptRun() {
-  Comments_.getLastTimeScriptRun(TEST_DOC_ID_)
+  var a = Comments_.getLastTimeScriptRun(TEST_DOC_ID_)
   return
 }
 

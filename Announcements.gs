@@ -61,11 +61,11 @@ function formatFont_oneWeek()                   {formatFont_oneWeek_()}
 // ----------------------
 
 function inviteStaffSponsorsToComment()     {inviteStaffSponsorsToComment_()}
-function rotateContent()                    {rotateContent_()}
+function rotateContent()                    {process2WeekDoc_()}
 // function copySlides()                       {copySlides_()} // 0 weeks
 function reorderParagraphs()                {reorderParagraphs_()}
 function removeShortStartDates()            {removeShortStartDates_()}
-function formatGDoc()                       {formatGDoc_()}
+function formatGDoc()                       {formatGDoc_(); cleanInstancesofLiveAnnouncement_()}
 function updateWeek2EventDescriptions()     {updateWeek2EventDescriptions_()}
 function modifyDatesInBody()                {modifyDatesInBody_()}
 function countInstancesofLiveAnnouncement() {countInstancesofLiveAnnouncement_()}

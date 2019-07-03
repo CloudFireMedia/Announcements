@@ -1,7 +1,5 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v1.4"
-
-var ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
+var SCRIPT_VERSION = "v1.5"
 
 var config = {
   

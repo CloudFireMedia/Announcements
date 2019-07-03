@@ -1,3 +1,13 @@
+// v1.5
+// ----
+//
+// - Added instance extra "display/clear tallies" calls
+
+// v1.4
+// ----
+//
+// - For add-on (?)
+
 // v1.2.1
 // ------
 //
