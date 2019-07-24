@@ -24,7 +24,7 @@ var Comments_ = (function(ns) {
 
     var activeDoc = DocumentApp.getActiveDocument()
     var fileId = (activeDoc === null) ? TEST_DOC_ID_ : activeDoc.getId()
-    var comments = Drive.Comments.list(fileId);
+    var comments = Comments_.getAllComments(fileId);
     var foundComment = false
     
     if (comments.items && comments.items.length > 0) {    
@@ -72,7 +72,7 @@ var Comments_ = (function(ns) {
    
   ns.getLastTimeScriptRun = function(documentId) {
     
-    var comments = Drive.Comments.list(documentId);    
+    var comments = Comments_.getAllComments(documentId);    
     var lastTimeContentRotated = null;
     var ui = getUi_();
     var title = 'Failed to get last time script run';
@@ -130,7 +130,93 @@ var Comments_ = (function(ns) {
     }
     
   } // Comments_.getLastTimeScriptRun()
+
+  /**
+   * Get all pages of comments and place them in the items array
+   *
+   * @param {string} documentId
+   *
+   * @return {object} all the comments
+   */
+
+  ns.getAllComments = function(documentId) {
   
+    var nextPageToken = ''
+    var totalNumberOfComments = 0
+    
+    var allComments = {
+      items: []
+    }
+    
+    do {
+  
+      var nextPageOfComments = Drive.Comments.list(documentId, {fields: '*', pageToken: nextPageToken}) 
+      var nextPageToken = nextPageOfComments.nextPageToken
+      
+      if (!nextPageOfComments.hasOwnProperty('items') || nextPageOfComments.items[0] === undefined) {
+        log('No comments')
+        break
+      }
+      
+      var numberOfComments = nextPageOfComments.items.length 
+      totalNumberOfComments += numberOfComments
+      
+      nextPageOfComments.items.forEach(function(nextComment) {
+        allComments.items.push(nextComment)
+      })
+      
+    } while (nextPageToken !== undefined) // while calls to make
+    
+    log('totalNumberOfComments: ' + totalNumberOfComments)
+    return allComments
+  
+  } // Comments_.getAllComments()
+
+  /**
+   * Remove any of the users comments that are more than a month old
+   */
+
+  ns.removeUsersOldComments = function() {
+  
+    log('Removing old user comments: ' + Session.getActiveUser().getEmail())
+  
+    var ONE_MONTH_IN_MS = 28 * 24 * 60 * 60 * 1000
+    var oneMonthAgo = new Date((new Date()).getTime() - ONE_MONTH_IN_MS)
+    var docId = DocumentApp.getActiveDocument().getId()
+  
+    Comments_.getAllComments(docId).items.forEach(function(nextComment) {
+    
+      if (!nextComment.author.isAuthenticatedUser) {
+        return
+      }
+        
+      var modifiedDate = new Date(nextComment.modifiedDate)  
+      var createdDate = new Date(nextComment.createdDate)  
+      
+      if (modifiedDate < oneMonthAgo && createdDate < oneMonthAgo) {
+        
+        var description = 
+          'created: '  + nextComment.modifiedDate + ', ' + 
+          'modified: ' + nextComment.createdDate + ', ' + 
+          'status: '   + nextComment.status + ', ' + 
+          'deleted: '  + nextComment.deleted + ', ' + 
+          'content: '  + nextComment.content
+        
+        try {
+            
+          Drive.Comments.remove(docId, nextComment.commentId)   
+          log('Deleted - ' +  description)
+          
+        } catch(error) {
+          
+          log('Failed to delete - ' + description + ' - ' + error.message)
+        }
+      }
+        
+    }) // for each comment
+          
+  } // removeUsersOldComments()
+
   return ns
 
 })(Comments_ || {})

@@ -1,5 +1,5 @@
 var SCRIPT_NAME = "Announcements"
-var SCRIPT_VERSION = "v1.5"
+var SCRIPT_VERSION = "v1.6"
 
 var config = {
   

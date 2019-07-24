@@ -1,4 +1,5 @@
-var TEST_DOC_ID_ = '1m2QHvYcC-a9ywnHu7KHHBG7u5ksF2da9uQQwHXP6MaI' // [ 07.21 ] Sunday Announcements - Draft Document
+// var TEST_DOC_ID_ = '1m2QHvYcC-a9ywnHu7KHHBG7u5ksF2da9uQQwHXP6MaI' // [ 07.21 ] Sunday Announcements - Draft Document
+var TEST_DOC_ID_ = '1nwqLAYy9MI6xhzgciSmF5S2m0Aj-ec3PMN8WRM0zY-Y' // Live CCN Week 2 GDoc
 
 function test_misc() {
   while(true)
@@ -76,52 +77,71 @@ function test_createComment() {
   test_listComments()
 }
 
-function test_removeComments() {
-  var comments = Drive.Comments.list(TEST_DOC_ID_); 
-  for (var i = 0; i < comments.items.length; i++) {   
-    var nextComment = comments.items[i]  
-    Logger.log('before - status: ' + nextComment.status + ', deleted: ' + nextComment.deleted + ', content: ' + nextComment.content); 
-    Logger.log('Removing ' + nextComment.content)    
-    Drive.Comments.remove(DOC_ID, nextComment.commentId)
-  } 
-  
-  test_listComments()
-} // test_removeComments()
-
 function test_updateComment() {
-  var commentId = 'AAAACkLLiH0'
-  var resource = {status: 'resolved'}
-  var result = Drive.Comments.update(resource, TEST_DOC_ID_, commentId)
+  Comments_.update(config.lastTimeRotateRunText);
+//  var commentId = 'AAAACkLLiH0'
+//  var resource = {status: 'resolved'}
+//  var result = Drive.Comments.update(resource, TEST_DOC_ID_, commentId)
   return
 }
 
 function test_listComments() {
 
-  var comments = Drive.Comments.list(TEST_DOC_ID_); 
+//  var comments = Drive.Comments.list(TEST_DOC_ID_, {"pageSize": 99}); // NO
+//  var comments = Drive.Comments.list(TEST_DOC_ID_, {"pageSize": 100}); // NO
+//  var comments = Drive.Comments.list(TEST_DOC_ID_, {pageSize: 100}); // NO
+//  var comments = Drive.Comments.list(TEST_DOC_ID_, {fields: '*', pageSize: 100}); // NO
+//  var comments = Drive.Comments.list(fileId, optionalArgs)
+
+  var pageToken = ''
+  var count = 0
+
+  for (var j = 0; j < 100; j++) {
+
+    var comments = Drive.Comments.list(TEST_DOC_ID_, {fields: '*', pageToken: pageToken}); 
+    var pageToken = comments.nextPageToken
+    
+    if (comments.items[0] === undefined) {
+      Logger.log('No comments')
+      return
+    }
+    
+    var numberOfComments = comments.items.length
+    
+    Logger.log('Number of comments: ' + numberOfComments)
+
+    count += numberOfComments
+
+    if (numberOfComments < 20) {
+      break;
+    }    
+
+    if (comments.items && numberOfComments > 0) { 
+    
+      for (var i = 0; i < numberOfComments; i++) { 
+      
+        var comment = comments.items[i]; 
+        
+        if (comment.content.indexOf(config.lastTimeRotateRunText) === 0) {     
+//        Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted + ', modified: ' + comment.modifiedDate); 
+          Logger.log('content: ' + comment.content); 
+        }
+      } 
+      
+    } else { 
+    
+      Logger.log('No comment found.'); 
+    }
+    
+  } // for each call
   
-  if (comments.items[0] === undefined) {
-    Logger.log('No comments')
-    return
-  }
+  Logger.log(count)
   
-  var numberOfComments = comments.items.length
-  Logger.log('Number of comments: ' + numberOfComments)
-  
-  if (comments.items && numberOfComments > 0) { 
-    for (var i = 0; i < numberOfComments; i++) { 
-      var comment = comments.items[i]; 
-      var modifiedDateString = comment.modifiedDate
-      var modifiedDate = new Date(modifiedDateString)      
-      Logger.log('content: ' + comment.content + ', status: ' + comment.status + ', deleted: ' + comment.deleted + ', modified: ' + modifiedDateString); 
-      var lastWeek = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000))
-      if (modifiedDate > lastWeek) {
-//       Logger.log('last week')
-      } else if (modifiedDate < lastWeek) {
-//        Logger.log('Longer than a week')
-      }
-//      Logger.log('modified: ' + modifiedDateString)
-    } 
-  } else { 
-    Logger.log('No comment found.'); 
-  } 
+  return
+}
+
+function test_getAllComments() {
+  var a = getAllComments(TEST_DOC_ID_)
+  var b = a.items.length
+  return
 }

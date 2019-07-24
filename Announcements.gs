@@ -71,6 +71,9 @@ function modifyDatesInBody()                {modifyDatesInBody_()}
 function countInstancesofLiveAnnouncement() {countInstancesofLiveAnnouncement_()}
 function cleanInstancesofLiveAnnouncement() {cleanInstancesofLiveAnnouncement_()}
 
+// This one is kept separate and only run from the bound script
+function onRemoveUsersOldComments()          {Comments_.removeUsersOldComments()}
+
 // Archive
 // -------
 

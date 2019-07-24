@@ -339,7 +339,7 @@ function inviteStaffSponsorsToComment_() {
   function checkName(documentShortDate) {
   
     var staffToEmail = makeStaffMailList();
-    var rawCommentData = Drive.Comments.list(documentId);
+    var rawCommentData = Comments_.getAllComments(documentId);
     var commentsContent = getOpenCommentsContent();
     var emailListArray = [];
     

@@ -1,3 +1,8 @@
+// v1.6
+// ----
+//
+// - Added paging to comment listing
+
 // v1.5
 // ----
 //
