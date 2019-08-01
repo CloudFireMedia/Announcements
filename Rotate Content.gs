@@ -307,9 +307,13 @@ Do you want to continue?\
 //events written in 'This Sunday's Announcements' doc to the destination folder
 
 function copySlides_() {
-  log('Start: copySlides_()');
+
+  var logSheet = SpreadsheetApp.openById(Config.get('ANNOUNCEMENTS_LOG')).getSheetByName('Log')
+  log('Start: copySlides_()', logSheet);
+  
   var doc = DocumentApp.openById(Config.get('ANNOUNCEMENTS_0WEEKS_SUNDAY_ID'));
   var text = doc.getBody().editAsText().getText();
+  
   var announcementStartRegEx = /\[[^\|\]]+\|/g;
   var fileTitleArray = [];
   var fileTitleMatch;
@@ -329,20 +333,20 @@ function copySlides_() {
   
   var folderSource = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_SOURCE_ID'));
   var folderDestination = DriveApp.getFolderById(Config.get('SLIDES_FOLDER_DESTINATION_ID'));
-  if( ! folderSource) throw new Error('Unable to open source folder for slides.')
-  if( ! folderDestination) throw new Error('Unable to open destination folder for slides.')
-  if( ! (folderSource && folderDestination)) return;
+  if ( ! folderSource) throw new Error('Unable to open source folder for slides.')
+  if ( ! folderDestination) throw new Error('Unable to open destination folder for slides.')
+  if ( ! (folderSource && folderDestination)) return;
   
   //delete existing files
   var filesDestination = folderDestination.getFiles();
-  if( ! filesDestination) throw new Error('Unable to access slide destination folder')
-  try{
+  if ( ! filesDestination) throw new Error('Unable to access slide destination folder')
+  try {
     while (filesDestination.hasNext()) {
       var nextFile = filesDestination.next()
       nextFile.setTrashed(true);
-      log('Deleted "' + nextFile.getName() + '" in "' + folderDestination.getId() + '"')
+      log('Deleted "' + nextFile.getName() + '" in "' + folderDestination.getId() + '"', logSheet)
     }
-  }catch(e){
+  } catch(e){
     throw new Error('Unable to delete old files from slide destination folder')
   }
   
@@ -350,19 +354,20 @@ function copySlides_() {
   
   //copy this weeks files to folder
   var filesSource = folderSource.getFiles();
-  try{
+  var threshold = getConfig_('MATCH_THRESHOLD')
+  try {
     while (filesSource.hasNext()) {
       var file = filesSource.next();
-      var filename = file.getName();//could check by mimetype
-      if (filename.match(/\.jpg|\.png/)){//only copy image files
+      var filename = file.getName();
+      if (filename.match(/\.jpg|\.png/)) {//only copy image files
         for (var f in fileTitleArray) {
-          var filenameSansExt = filename.replace(/\.[^.]+$/i, '');//remove extension
-          log('filenameSansExt: ' + filenameSansExt)
-          var compareResult = compareStrings(filenameSansExt, fileTitleArray[f]);
-          log('compareResult: ' + compareResult);
-          if (compareResult > 0.75) {//check file name against announcement title
+          filename = filename.replace(/\.[^.]+$/i, '');//remove extension
+          filename = filename.replace(/\[[^]*\]/g, '').trim();//remove "[...]" prefix 
+          var compareResult = compareStrings(filename, fileTitleArray[f]);
+          log('match of file "' + filename + '" and "' + fileTitleArray[f] + '": ' + compareResult, logSheet);
+          if (compareResult > threshold) {//check file name against announcement title
             file.makeCopy(folderDestination);
-            log('Created copy of "' + filename + '" in "' + folderDestination.getId() + '"')
+            log('Created copy of "' + filename + '" in "' + folderDestination.getId() + '"', logSheet)
           }
         }
       }
@@ -371,6 +376,6 @@ function copySlides_() {
     throw new Error('Unable to copy slides to destination folder')
   }
   
-  log('End: copySlides_()')
+  log('End: copySlides_()', logSheet)
   
 } // copySlides_()

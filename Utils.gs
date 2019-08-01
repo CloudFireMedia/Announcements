@@ -10,8 +10,11 @@ function getUpcomingSunday(date, skipTodayIfSunday) {
   return date;
 }
 
-function log(message) {
-  SpreadsheetApp.openById(Config.get('ANNOUNCEMENTS_LOG')).getSheetByName('Log').appendRow([new Date(), message])
+function log(message, logSheet) {
+  if (logSheet === undefined) {
+    logSheet = SpreadsheetApp.openById(Config.get('ANNOUNCEMENTS_LOG')).getSheetByName('Log')
+  }
+  logSheet.appendRow([new Date(), message])
 }
 
 //returns the date formatted with format, default to today if date not provided
@@ -279,13 +282,22 @@ function getDateInName(name) {
   return date;
 }
 
-function extractSundayTitle(doc){
-  var search = doc.getBody().findText(config.announcements.sundayPagePattern);
-  return search
-  ? search.getElement().asText().getText()
-  : null;
-}
-
 function getUi_() {
   return (DocumentApp.getActiveDocument() !== null) ? DocumentApp.getUi() : null
+}
+
+function getConfig_(id) {
+  var value = null
+  var configSpreadsheetId = Config.get('ANNOUNCEMENTS_LOG')
+  var configSheet = SpreadsheetApp.openById(configSpreadsheetId).getSheetByName('Config')
+  var data = configSheet.getDataRange().getValues()
+  data.some(function(row) {
+    if (row[0] === id) {
+      value = row[1]
+    }
+  })
+  if (value === null) {
+    throw new Error('Could not find value with id ' + id)
+  }
+  return value
 }
